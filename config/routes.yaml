@@ -1,0 +1,82 @@
+home:
+    path: /
+    controller: App\Controller\IndexController::index
+
+admin:
+    path: /admin
+    controller: App\Controller\IndexController::index
+
+account:
+    path: /account
+    controller: App\Controller\IndexController::index
+
+login:
+    path: /login
+    controller: App\Controller\IndexController::index
+
+logout:
+    path: /logout
+
+registration:
+    path: /registration
+    controller: App\Controller\IndexController::index
+
+registration_social:
+    path: /registration-social
+    controller: App\Controller\IndexController::index
+
+password_reset_request:
+    path: /password-reset-request
+    controller: App\Controller\IndexController::index
+  
+registration_result:
+    path: /registration-result/{status}
+    controller: App\Controller\IndexController::index
+
+api_get_initial_data_for_offline:
+    path: /api-offline/get-offline-initial
+    controller: App\Controller\ApiOfflineController::InitialDataForOfflineAction
+
+api_get_user_data_for_offline:
+    path: /api-offline/get-offline-user
+    controller: App\Controller\ApiOfflineController::UserDataForOfflineAction
+
+api_session:
+    path: /api-session
+    controller: App\Controller\ApiSessionController::SessionIdleAction
+
+api_csrf:
+    path: /api/csrf
+    controller: App\Controller\ApiSessionController::getCsrfTokenAction
+
+api_address_insert:
+    path: /api-address/insert
+    controller: App\Controller\ApiAddressController::AddressInsertAction
+
+api_address_change:
+    path: /api-address/change
+    controller: App\Controller\ApiAddressController::AddressChangeAction
+
+fos_user_registration_register:
+    path:      /register/
+    controller: App\Controller\RegistrationController::registerAction
+    
+fos_user_registration_confirm:
+    path: /register/confirm/{token}
+    controller: App\Controller\RegistrationController::confirmAction
+
+fos_user_registration_check_email:
+    path: /check-email
+    controller: App\Controller\RegistrationController::checkEmailAction
+
+fos_user_resetting_send_email:
+    path: /resetting/send-email
+    controller: App\Controller\ResettingController::SendEmailAction
+
+fos_user_resetting_reset:
+    path: /resetting/reset/{token}
+    controller: App\Controller\IndexController::index
+
+fos_user_security_check:
+    path: /login_check
+    controller: fos_user.security.controller:checkAction

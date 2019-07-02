@@ -1,0 +1,25 @@
+###< symfony/framework-bundle ###
+.DS_Store
+.env.local
+.env
+.babelrc
+###> symfony/framework-bundle ###
+~/.Trash
+/var/
+/vendor/
+/vendor-fosDELETE/
+/node_modules/
+/TODOS/
+/assets/
+/public/dist/
+/client/parameters.js
+###< symfony/framework-bundle ###
+###> symfony/phpunit-bridge ###
+.phpunit
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+###> symfony/web-server-bundle ###
+.web-server-pid
+###< symfony/web-server-bundle ###
+

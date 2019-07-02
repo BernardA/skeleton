@@ -1,0 +1,762 @@
+
+/**
+* general rules
+*/
+
+body {
+  margin: 0 auto;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  color: #0b172a
+}
+
+#root {
+	background-color: #F5F7FA;
+	margin: 0 auto;
+    max-width: 1200px;
+    min-width: 320px;
+}
+
+.center_300 {
+    width: 300px;
+    margin: 0 auto;
+}
+
+.icon_container, .message_row {
+    cursor: pointer;
+}
+
+main {
+    min-height: 500px;
+    margin: 0 auto;
+    padding: 20px 10px;
+    background-color: #fff;
+}
+
+#mailbox_choices .active, .active {
+    color: #445565;
+    background-color: #de1b;
+    border-color: #ced4da;
+}
+
+
+img {
+    width: 100%;
+    height: auto;
+}
+
+table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.no_show {
+    display: none;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.disabled {
+    pointer-events: none;
+}
+
+.no_click {
+    pointer-events: none;
+}
+
+li {
+    list-style-type: none;
+}
+
+.loading_indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+}
+
+.notification .notification_title {
+    background-color: #de1b;
+    padding: 0 24px;
+}
+
+.notification_title h2 {
+    line-height: 50px;
+}
+
+.notification_content {
+    border-bottom: 1px solid #ccc;
+}
+
+.notification_content div {
+    margin-top: 20px;
+}
+
+.notification_action button:nth-child(2) {
+    margin-left:10px;
+}
+
+.notifier {
+    justify-content: space-between;
+}
+
+/**
+* grid
+*/
+
+.grid {
+    display: grid;
+}
+
+/**
+* flexbox
+*/
+
+.flex {
+    display: flex;
+}
+
+.flex_column {
+    flex-direction: column;
+}
+
+.flex_wrap {
+    flex-wrap: wrap;
+}
+
+
+
+/**
+* form
+*/
+
+form {
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.form_input{
+    margin:0 auto 15px;
+}
+
+.form_input div:first-child {
+    margin:0;
+}
+
+.form_submit div:first-child {
+    justify-content: space-between;
+}
+
+.form_select div:first-child {
+    display:grid;
+}
+
+.form_error{
+    color: red;
+    font-size: 14px;
+}
+
+input[type="radio"] {
+    margin-right: 5px;
+}
+
+/**
+* header
+*/
+
+.header_top {
+    grid-template-columns: 190px auto;
+    background-color: #2d5074;
+    height: 60px;
+}
+
+.branding {
+    justify-self: start;
+    width: 190px;
+}
+
+.status {
+    justify-self: end;
+}
+
+.status_user {
+    width: 65px;
+    display: block;
+    word-wrap: break-word;
+}
+
+.signer button, .signer a {
+	font-weight: 600;
+	width: 65px;
+	color: #fff;
+	height: 60px;
+	font-size: 12px;
+    flex-direction: column;
+}
+
+.signer div:first-child {
+    border-left-color: #ccc;
+}
+
+.nav.grid {
+    grid-template-columns: repeat(auto-fill, minmax(60px, auto));
+    padding: 0 10px 0 0;
+    background-color: #fff;
+}
+
+.nav a {
+	text-transform: uppercase;
+    text-decoration: none;
+    color: #445565;
+}
+
+.nav li {
+    padding: 0 5px 0;
+    font-weight: 700;
+    font-size: 0.8rem;
+    height: 35px;
+}
+
+
+/**
+* pagination
+*/
+
+#pagination.grid {
+    grid-template-columns: repeat(auto-fit, minmax(35px, auto));
+    text-align: center;
+    align-items: center;
+}
+
+#pagination.grid div:first-child {
+    justify-self: start;
+}
+
+#pagination.grid nav:last-child {
+    justify-self: end;
+}
+
+#pagination li:hover {
+    background-color: #ccc;
+}
+
+#pagination li {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+
+#pagination li button {
+    background-color: #fff;
+    box-shadow: none;
+    width: 40px;
+    height: 40px;
+}
+
+#pagination ul {
+    justify-content: flex-end;
+}
+
+.dialog_toolbar {
+    justify-content: flex-end
+}
+
+.dialog_toolbar button {
+    display: block;
+}
+
+.dialog_toolbar button span {
+    pointer-events: none;
+}
+
+.page-link:not(:disabled):not(.disabled) {
+    cursor: pointer;
+}
+
+#pagination .page-item.active .page-link {
+    z-index: 1;
+    background-color: #e0e0e0;
+}
+
+ul.pagination li.page-item.active a.page-link {
+    color: #445565 !important;
+    background-color: #e3e7eb !important;
+    border-color: #ced4da !important;
+}
+
+.current-page {
+    font-size: 1.5rem;
+    vertical-align: middle;
+}
+
+
+/**
+* home page
+*/
+
+
+#map_canvas {
+    height: 100%;
+    width: 100%;
+    position:relative;
+    z-index: -10;
+}
+
+#hero_img {
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    background-size: cover;
+    background-position: center center;
+    position: relative;
+}
+
+
+
+/**
+* form ad_insert
+*/
+
+
+.list_item:hover {
+    background-color: #ccc;
+    cursor: pointer
+}
+
+.list_item * {
+    pointer-events: none;
+}
+
+#description_progression {
+    height: 6px;
+    width: 0%;
+}
+
+div[role="radiogroup"]{
+    justify-content: space-around;
+}
+
+
+/**
+* account page
+*/
+
+#account td:first-child {
+    width: 40%;
+    padding: 4px 0 4px 24px;
+}
+
+#profile_image {
+    width: 250px;
+}
+
+#img_crop {
+    max-width: 100%;
+    text-align:center;
+}
+
+#img_crop canvas {
+    display: inline;
+}
+
+/**
+* account_contacts page 
+*/
+
+.contact_name {
+    width: 80px;
+}
+
+.contact_trash {
+    width: 30px;
+    
+}
+
+/**
+* password reset 
+*/
+
+form[name="password_reset_form"], form[name="fos_user_resetting_form"] {
+    width: 300px;
+    margin: 0 auto;
+}
+
+/**
+* mailbox page
+*/
+
+#mailbox_main svg {
+    width: 20px;
+}
+.mail_username, .mail_time {
+    width: 80px;
+}
+
+.mail_sub, .mail_mess {
+    width: 150px;
+}
+
+#mailbox_main tr:nth-child(even) {
+    background-color: #f2f2f2
+}
+
+.ellipsis {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.mb_choices {
+    grid-template-columns: repeat(auto-fit, minmax(30%, auto));
+    justify-content: space-evenly;
+    height: 40px;
+    line-height: 40px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+button span {
+    pointer-events: none;
+}
+
+
+
+/**
+* new_message page
+*/
+#attach_dialog {
+    margin-left: 10%;
+    max-width: 300px;
+}
+
+#attach_dialog tr {
+    display:none;
+}
+
+#attach_dialog td:first-child {
+    max-width: 150px;
+    min-width: 150px;
+}
+
+#attach_dialog td:nth-child(2) {
+    width: 50px;
+}
+
+#attach_dialog tr:nth-child(2n) {
+    background-color: initial;
+}
+
+#imgFile {
+    display: none;
+}
+
+#imgFile_label {
+    cursor: pointer;
+}
+
+#message_form li{
+    list-style-type: none;
+}
+
+.form_group button:first-child {
+    margin-left: 0;
+}
+
+/**
+* message read page
+*/
+
+.message_top {
+    grid-template-columns: 40px 120px 120px;
+    grid-gap: 20px;
+    justify-content: space-evenly;
+    height: 30px;
+    line-height: 30px;
+    cursor: pointer;
+}
+
+.message_top > div {
+    pointer-events: none;
+}
+
+.message_all {
+    border-bottom: 2px solid #ccc;
+    padding: 10px 0 10px;
+    margin: 0 10px 0;
+}
+
+.message_all.grid {
+    grid-template-columns: auto 105px;
+    grid-gap: 20px;
+}
+
+.message_all.grid span {
+    max-width: 300px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.message_all.grid.svg-inline--fa {
+    line-height: 40px;
+}
+
+.grid.action_icons {
+    grid-template-columns: repeat(auto-fit, minmax(35px, auto));
+    justify-content: space-evenly;
+    text-align: center;
+}
+
+.action_icons > div {
+    cursor: pointer;
+}
+
+.message_bottom {
+    display: none;
+}
+
+.no_attachment {
+    display: none;
+}
+
+#message_all_0 .message_bottom {
+    display: block;
+}
+
+#choices_reply {
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    cursor: pointer;
+}
+
+/**
+* attachment viewer page
+*/
+
+.doc_viewer {
+    justify-content: center;
+}
+
+.doc_viewer p {
+    text-align: right;
+}
+
+.react-pdf__Page {
+    max-width: 500px;
+    width: 90vw;
+}
+
+.react-pdf__Page__svg {
+	width: auto !important;
+	height: auto !important;
+	border-radius: 8px;
+}
+
+.react-pdf__Page__svg svg {
+    border-radius: 8px;
+    max-width: 400px;
+    width: 90vw;
+    height: auto;
+    display: block;
+    background-color: #FFF;
+}
+
+
+/**
+* media queries
+*/
+
+@media only screen and (min-width: 1024px){
+    /* to avoid issues with twig, first selector cannot be #...https://github.com/twigphp/Twig/issues/2791*/
+    .ficticious_selector {
+        height: 0%;
+    }
+
+    #hero_img {
+        background-image: url(/img/hero-img-1024.webp);
+    }
+}
+
+
+@media only screen and (max-width: 1024px){
+    .ficticious_selector {
+        height: 0%;
+    }
+
+    #root {
+        width: 100%;
+    }
+    #hero_img {
+        background-image: url(/img/hero-img-640.webp);
+    }
+}
+
+@media only screen and (max-width: 760px){
+    .ficticious_selector {
+        height: 0%;
+    }
+
+    #hero_img {
+        background-image: url(/img/hero-img-640.webp);
+    }
+
+    #message_form .form_group {
+        flex-wrap: unset;
+    }
+
+    #mailbox_main .message_row {
+        grid-template-columns: [vert1] 100px [vert2] auto [vert3] 50px [vert4] 50px [vert5];
+        grid-template-rows: [horiz1] 33% [horiz2] 34% [horiz3] 33% [horiz4];
+        height: 81px;
+        line-height: 27px;
+        display: grid;
+    }
+
+    #mailbox_main .mail_username {
+        grid-column-start: vert1;
+        grid-column-end: vert2;
+        grid-row-start: horiz1;
+        grid-row-end: horiz2;
+        border-bottom: initial;
+        width: auto;
+    }
+
+    #mailbox_main .mail_sub {
+        grid-column-start: vert1;
+        grid-column-end: vert3;
+        grid-row-start: horiz2;
+        grid-row-end: horiz3;
+        border-bottom: initial;
+        width: auto;
+    } 
+
+    #mailbox_main .mail_mess {
+        grid-column-start: vert1;
+        grid-column-end: vert4;
+        grid-row-start: horiz3;
+        grid-row-end: horiz4;
+        width: auto;
+    }
+
+    #mailbox_main .mail_time {
+        grid-column-start: vert2;
+        grid-column-end: vert3;
+        grid-row-start: horiz1;
+        grid-row-end: horiz2;
+        text-align: right;
+        border-bottom: initial;
+        width: auto;
+    }
+
+    #mailbox_main .mail_trash {
+        grid-column-start: vert4;
+        grid-column-end: vert5;
+        grid-row-start: horiz1;
+        grid-row-end: horiz4;
+        line-height: 81px;
+    }
+
+    #mailbox_main .mail_attach {
+        grid-column-start: vert3;
+        grid-column-end: vert4;
+        grid-row-start: horiz2;
+        grid-row-end: horiz3;
+        border-bottom: initial;
+        width: auto;
+    }
+
+    #account_contacts .contact_row {
+        grid-template-columns: [vert1] 100px [vert2] auto [vert3] 60px [last-col];
+        grid-template-rows: [horiz1] 50% [horiz2] 50% [last-line] ;
+        height: 80px;
+        line-height: 40px;
+        display: grid; 
+        border-bottom: 1px solid #ccc;   
+    }
+
+    #account_contacts .contact_name {
+        grid-column-start: vert1;
+        grid-column-end: vert2;
+        grid-row-start: horiz1;
+        grid-row-end: horiz2;
+        border-bottom: initial;
+        width: auto;
+    }
+
+    #account_contacts .contact_trash {
+        grid-column-start: vert3;
+        grid-column-end: last-col;
+        grid-row-start: horiz1;
+        grid-row-end: horiz3;
+        border-bottom: initial;
+        width: auto;
+        line-height: 80px;
+    }
+
+    #account_contacts .contact_email {
+        grid-column-start: vert1;
+        grid-column-end: vert3;
+        grid-row-start: horiz2;
+        grid-row-end: last-line;
+        border-bottom: initial;
+        width: auto;
+    }
+}
+
+@media only screen and (max-width: 480px){
+    .ficticious_selector {
+        height: 0%;
+    }
+
+    .nav li {
+        font-size: .7rem;
+    }
+
+    .content {
+        flex-direction: column;
+    }
+    
+    #hero_img {
+        /*background-image: url(/img/hero-img-320.webp);*/
+        background-image: none;
+    }
+
+    .ad_form {
+        width: 100%;
+    }
+
+    .ad_form div:first-child {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .ad_insert_form {
+        width: 100%;
+        margin: 0;
+    }
+
+    .ad_details {
+        display: inherit;
+    }
+
+    .main_slider {
+        position: initial;
+    }
+
+    #map_canvas {
+        position: initial;
+        height: 300px;
+    }
+
+    .message_all.grid span {
+        max-width: 195px;
+    }
+    
+}
+
