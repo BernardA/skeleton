@@ -87,8 +87,8 @@ export function actionInsertAddress(values) {
     }
     data.append('address_form[city]', values.city);
     data.append('address_form[postalCode]', values.postal_code);
-    // data.append('address_form[lat]', null);
-    // data.append('address_form[lng]', null);
+    data.append('address_form[lat]', null);
+    data.append('address_form[lng]', null);
 
     return {
         type: INSERT_ADDRESS,

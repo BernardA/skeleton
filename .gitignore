@@ -7,9 +7,8 @@
 ~/.Trash
 /var/
 /vendor/
-/vendor-fosDELETE/
 /node_modules/
-/TODOS/
+/TODO/
 /assets/
 /public/dist/
 /client/parameters.js
