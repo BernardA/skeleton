@@ -5,7 +5,6 @@ import { withRouter, Link } from 'react-router-dom';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { withStyles } from '@material-ui/core/styles';
-import localforage from 'localforage';
 import LoadableVisibility from 'react-loadable-visibility/react-loadable';
 import PropTypes from 'prop-types';
 import { LoadingVisibility, Loading } from '../../components/loading';
@@ -28,7 +27,6 @@ class Register extends React.Component {
         super(props);
         this.state = {
             isLoading: false,
-            status: null,
             notification: {
                 status: '',
                 title: '',
@@ -53,7 +51,6 @@ class Register extends React.Component {
             if (result.payload.data.status === 'error') {
                 this.setState({
                     isLoading: false,
-                    status: 'error',
                     notification: {
                         status: 'error',
                         title: 'There was an error.',
@@ -72,32 +69,32 @@ class Register extends React.Component {
                 resolve(this.props.actionRegister(result));
             });
             submitForm.then((result1) => {
-                if (result1.payload.data.status === 'error') {
+                const data = result1.payload.data;
+                if (data.status === 'error') {
+                    let title = 'There was an error.';
+                    let message = 'Please review the following:';
+                    let errors = data.errors;
+                    if (data.errors === 'not submitted') {
+                        title = 'Unknown error.';
+                        message = 'Please try again';
+                        errors = {};
+                    }
                     this.setState({
                         isLoading: false,
-                        status: 'error',
                         notification: {
                             status: 'error',
-                            title: 'There was an error.',
-                            message: 'Please review the following:',
-                            errors: result1.payload.data.errors,
+                            title,
+                            message,
+                            errors,
                         },
                     });
                     return;
                 }
-                if (result.payload.data.pending_ad) {
-                    localforage.removeItem('pending_ad_id');
-                    // dispatch event to get initial data for offline
-                    // from header component in order to show the just published ad
-                    const getInitialData = new CustomEvent('get_initial_data');
-                    window.dispatchEvent(getInitialData);
-                }
                 const message = `A confirmation e-mail was sent to 
-                    ${result.payload.data.email}. 
+                    ${data.email}. 
                     Please check your mailbox and click on the link on that e-mail.`;
                 this.setState({
                     isLoading: false,
-                    status: 'ok',
                     notification: {
                         status: 'ok_and_dismiss',
                         title: 'You are now registered.',
@@ -106,12 +103,21 @@ class Register extends React.Component {
                     },
                 });
             });
-        }).catch((error) => {
-            console.log(error);
+        }).catch(() => {
+            this.setState({
+                isLoading: false,
+                notification: {
+                    status: 'error',
+                    title: 'Unknown error',
+                    message: 'Please try again',
+                    errors: {},
+                },
+            });
         });
     }
 
     handleNotificationDismiss = () => {
+        const status = this.state.notification.status;
         this.setState({
             notification: {
                 status: '',
@@ -120,10 +126,8 @@ class Register extends React.Component {
                 errors: {},
             },
         });
-        if (this.state.status === 'ok') {
+        if (status === 'ok') {
             this.props.history.push('/');
-        } else if (this.state.status === 'ok-social') {
-            this.props.history.push('/registration-social');
         }
     }
 

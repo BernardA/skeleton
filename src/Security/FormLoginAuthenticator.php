@@ -309,11 +309,6 @@ class FormLoginAuthenticator extends AbstractGuardAuthenticator
     }
 
     public function getProfile ($user) {
-        $xtra_id = $xtra_img = null;
-        if ($user->getUserXtra()) {
-            $xtra_id = $user->getUserXtra()->getId();
-            $xtra_img = $user->getUserXtra()->getImgFile();
-        }
         $profile = [];
         $profile['id'] = $user->getId();
         $profile['username'] = $user->getUsername();
@@ -327,8 +322,6 @@ class FormLoginAuthenticator extends AbstractGuardAuthenticator
         $profile['address']['postal_code'] = $user->getAddress()->getPostalCode();
         $profile['address']['lat'] = $user->getAddress()->getLat();
         $profile['address']['lng'] = $user->getAddress()->getLng();
-        $profile['xtra']['id'] = $xtra_id;
-        $profile['xtra']['img_file'] = $xtra_img;
         return $profile;
     } 
 }

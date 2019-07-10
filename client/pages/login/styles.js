@@ -2,7 +2,6 @@ export default () => {
     return ({
         root: {
             boxShadow: 'none',
-            textAlign: 'center',
         },
         loginAction: {
             width: '300px',
@@ -11,6 +10,7 @@ export default () => {
         },
         notMember: {
             margin: '20px 0',
+            textAlign: 'center',
         },
         forgotPassword: {
             display: 'block',

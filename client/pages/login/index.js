@@ -46,8 +46,16 @@ class Login extends React.Component {
         submitForm.then((result) => {
             console.log('login result', result);
             this.handlePostSubmitLogin(result);
-        }).catch((error) => {
-            console.log(error);
+        }).catch(() => {
+            this.setState({
+                isLoading: false,
+                notification: {
+                    status: 'error',
+                    title: 'Unknown error',
+                    message: 'Please try again',
+                    errors: {},
+                },
+            });
         });
     }
 

@@ -12,12 +12,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
+use FOS\UserBundle\Util\TokenGeneratorInterface;
 use App\Service\MiscServices;
-use App\Entity\Ad;
 use Doctrine\ORM\EntityManagerInterface;
 
 class RegistrationResponseSubscriber implements EventSubscriberInterface
@@ -29,8 +27,17 @@ class RegistrationResponseSubscriber implements EventSubscriberInterface
     private $router;
     private $miscServices;
     private $em;
+    private $tokenGenerator;
 
-    public function __construct(SessionInterface $session,TranslatorInterface $translator, UserManagerInterface $userManager, RouterInterface $router, MiscServices $miscServices, EntityManagerInterface $em)
+    public function __construct(
+        SessionInterface $session,
+        TranslatorInterface $translator, 
+        UserManagerInterface $userManager, 
+        RouterInterface $router, 
+        MiscServices $miscServices, 
+        EntityManagerInterface $em,
+        TokenGeneratorInterface $tokenGenerator
+        )
     {
         $this->session = $session;
         $this->translator = $translator;
@@ -38,6 +45,7 @@ class RegistrationResponseSubscriber implements EventSubscriberInterface
         $this->router = $router;
         $this->miscServices = $miscServices;
         $this->em = $em;
+        $this->tokenGenerator = $tokenGenerator;
     }
 
     public function onRegistrationSuccess(FormEvent $event)
@@ -49,27 +57,18 @@ class RegistrationResponseSubscriber implements EventSubscriberInterface
         // implement the functions from original FOS::RegistrationController::checkEmailAction
         $email = $this->session->get('fos_user_send_confirmation_email/email');
         $user = $this->userManager->findUserByEmail($email);
+        $user->setEnabled(false);
+        if (null === $user->getConfirmationToken()) {
+            $user->setConfirmationToken($this->tokenGenerator->generateToken());
+        }
+
         $this->session->remove('fos_user_send_confirmation_email/email');
         //$this->userManager->findUserByEmail($email) ? $user = true : $user = false;
-
-        //checks if there's an ad awaiting user to be registered
-        // if yes inserts user info on ad table
-        $pending_ad = false;
-        if ($this->session->get('pending_ad_id')) {
-            $pending_ad = true;
-            $ad_repo = $this->em->getRepository(Ad::class);
-            $ad = $ad_repo->findOneById($this->session->get('pending_ad_id'));
-            $ad->setUser($user);
-            $this->em->persist($ad);
-            $this->em->flush();
-            $this->session->remove('pending_ad_id');
-        } 
 
         $response  = new JsonResponse(array(
             'status' => 'ok',
             'email' => $email,
-            'user' => $user,
-            'pending_ad' => $pending_ad,
+            'username' => $user->getUsername(),
         ));  
         $event->setResponse($response);   
     }

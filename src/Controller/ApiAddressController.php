@@ -38,7 +38,6 @@ class ApiAddressController extends Controller
     public function AddressInsertAction(Request $request)
     {
         $this->initialise();
-        $lat = $request->request->get('lat');
         $address = new Address();
         $form = $this->createForm('App\Form\AddressType', $address);
         $form->handleRequest($request);
@@ -56,7 +55,6 @@ class ApiAddressController extends Controller
         return $this->json(array(
             'status' => 'error',
             'errors' => $errors,
-            'lat' => $lat,
         ));
     }
 

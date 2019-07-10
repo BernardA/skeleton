@@ -78,27 +78,6 @@ li {
     z-index: 10000;
 }
 
-.notification .notification_title {
-    background-color: #de1b;
-    padding: 0 24px;
-}
-
-.notification_title h2 {
-    line-height: 50px;
-}
-
-.notification_content {
-    border-bottom: 1px solid #ccc;
-}
-
-.notification_content div {
-    margin-top: 20px;
-}
-
-.notification_action button:nth-child(2) {
-    margin-left:10px;
-}
-
 .notifier {
     justify-content: space-between;
 }
@@ -158,6 +137,7 @@ form {
 .form_error{
     color: red;
     font-size: 14px;
+    text-align: left;
 }
 
 input[type="radio"] {
@@ -298,14 +278,6 @@ ul.pagination li.page-item.active a.page-link {
 * home page
 */
 
-
-#map_canvas {
-    height: 100%;
-    width: 100%;
-    position:relative;
-    z-index: -10;
-}
-
 #hero_img {
     min-width: 100%;
     min-height: 100%;
@@ -317,29 +289,6 @@ ul.pagination li.page-item.active a.page-link {
 }
 
 
-
-/**
-* form ad_insert
-*/
-
-
-.list_item:hover {
-    background-color: #ccc;
-    cursor: pointer
-}
-
-.list_item * {
-    pointer-events: none;
-}
-
-#description_progression {
-    height: 6px;
-    width: 0%;
-}
-
-div[role="radiogroup"]{
-    justify-content: space-around;
-}
 
 
 /**
@@ -606,70 +555,6 @@ button span {
         background-image: url(/img/hero-img-640.webp);
     }
 
-    #message_form .form_group {
-        flex-wrap: unset;
-    }
-
-    #mailbox_main .message_row {
-        grid-template-columns: [vert1] 100px [vert2] auto [vert3] 50px [vert4] 50px [vert5];
-        grid-template-rows: [horiz1] 33% [horiz2] 34% [horiz3] 33% [horiz4];
-        height: 81px;
-        line-height: 27px;
-        display: grid;
-    }
-
-    #mailbox_main .mail_username {
-        grid-column-start: vert1;
-        grid-column-end: vert2;
-        grid-row-start: horiz1;
-        grid-row-end: horiz2;
-        border-bottom: initial;
-        width: auto;
-    }
-
-    #mailbox_main .mail_sub {
-        grid-column-start: vert1;
-        grid-column-end: vert3;
-        grid-row-start: horiz2;
-        grid-row-end: horiz3;
-        border-bottom: initial;
-        width: auto;
-    } 
-
-    #mailbox_main .mail_mess {
-        grid-column-start: vert1;
-        grid-column-end: vert4;
-        grid-row-start: horiz3;
-        grid-row-end: horiz4;
-        width: auto;
-    }
-
-    #mailbox_main .mail_time {
-        grid-column-start: vert2;
-        grid-column-end: vert3;
-        grid-row-start: horiz1;
-        grid-row-end: horiz2;
-        text-align: right;
-        border-bottom: initial;
-        width: auto;
-    }
-
-    #mailbox_main .mail_trash {
-        grid-column-start: vert4;
-        grid-column-end: vert5;
-        grid-row-start: horiz1;
-        grid-row-end: horiz4;
-        line-height: 81px;
-    }
-
-    #mailbox_main .mail_attach {
-        grid-column-start: vert3;
-        grid-column-end: vert4;
-        grid-row-start: horiz2;
-        grid-row-end: horiz3;
-        border-bottom: initial;
-        width: auto;
-    }
 
     #account_contacts .contact_row {
         grid-template-columns: [vert1] 100px [vert2] auto [vert3] 60px [last-col];
@@ -727,35 +612,8 @@ button span {
         background-image: none;
     }
 
-    .ad_form {
-        width: 100%;
-    }
-
-    .ad_form div:first-child {
-        padding-left: 5px;
-        padding-right: 5px;
-    }
-
-    .ad_insert_form {
-        width: 100%;
-        margin: 0;
-    }
-
-    .ad_details {
-        display: inherit;
-    }
-
     .main_slider {
         position: initial;
-    }
-
-    #map_canvas {
-        position: initial;
-        height: 300px;
-    }
-
-    .message_all.grid span {
-        max-width: 195px;
     }
     
 }

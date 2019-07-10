@@ -13,17 +13,26 @@ class Status extends React.Component {
         };
     }
 
+    componentDidMount() {
+        this.setStatus();
+    }
+
     componentDidUpdate(prevProps) {
         if (this.props.allCookies !== prevProps.allCookies) {
-            if (this.props.allCookies.session) {
-                this.setState({
-                    username: this.props.allCookies.session.username,
-                });
-            } else {
-                this.setState({
-                    username: null,
-                });
-            }
+            this.setStatus();
+        }
+    }
+
+    setStatus = () => {
+        const { allCookies } = this.props;
+        if (allCookies.session) {
+            this.setState({
+                username: allCookies.session.username,
+            });
+        } else {
+            this.setState({
+                username: null,
+            });
         }
     }
 

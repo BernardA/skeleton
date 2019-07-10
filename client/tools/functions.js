@@ -160,3 +160,14 @@ export function DateDDMMYY(dateString) {
         day: '2-digit',
     }).format(date);
 }
+
+// https://jrsinclair.com/articles/2019/what-is-a-higher-order-function-and-why-should-anyone-care/
+function compareNumbers(a, b) {
+    if (a === b) return 0;
+    if (a > b) return 1;
+    return -1;
+}
+
+export function orderArrayOfObjects(element1, element2, prop) {
+    return -1 * compareNumbers(element1[prop], element2[prop]);
+}

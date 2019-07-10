@@ -2,20 +2,22 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
+import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import DialogActions from '@material-ui/core/DialogActions';
+import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+// import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+import styles from './styles';
 
-const theme = createMuiTheme({
-    overrides: {
-        MuiDialog: {
-            paperFullWidth: {
-                margin: 0,
-            },
-        },
-    },
+const DialogTitle = withStyles(styles)((props) => {
+    const { children, classes } = props;
+    return (
+        <MuiDialogTitle disableTypography className={classes.title}>
+            <Typography variant="h6" className={classes.h6}>{children}</Typography>
+        </MuiDialogTitle>
+    );
 });
 
 
@@ -46,6 +48,7 @@ class NotifierDialog extends React.Component {
     }
 
     actions = () => {
+        const { classes } = this.props;
         switch (this.props.notification.status) {
         case 'ok_and_dismiss':
             return (
@@ -55,7 +58,7 @@ class NotifierDialog extends React.Component {
                     color="primary"
                     autoFocus
                 >
-                        Dismiss
+                    Dismiss
                 </Button>
             );
         case 'error':
@@ -81,6 +84,7 @@ class NotifierDialog extends React.Component {
                     </Button>
                     <Button
                         id="session_extend"
+                        className={classes.buttonLeft}
                         onClick={this.props.handleSessionWarning}
                         color="primary"
                         autoFocus
@@ -134,6 +138,7 @@ class NotifierDialog extends React.Component {
                             Go to ad
                     </Button>
                     <Button
+                        className={classes.buttonLeft}
                         variant="outlined"
                         color="primary"
                         onClick={this.handleNotificationDismiss}
@@ -155,6 +160,7 @@ class NotifierDialog extends React.Component {
                     </Button>
                     <Button
                         id="cancelled"
+                        className={classes.buttonLeft}
                         variant="outlined"
                         color="primary"
                         onClick={this.props.handleNotificationDismiss}
@@ -169,26 +175,25 @@ class NotifierDialog extends React.Component {
     }
 
     render() {
+        const { classes } = this.props;
         if (this.props.notification.status !== '') {
             return (
-                <MuiThemeProvider theme={theme}>
-                    <Dialog
-                        className="notification"
-                        open={this.state.open}
-                        fullWidth
-                    >
-                        <DialogTitle className="notification_title">
-                            {this.props.notification.title}
-                        </DialogTitle>
-                        <DialogContent className="notification_content">
-                            <div>{this.props.notification.message}</div>
-                            {this.errors()}
-                        </DialogContent>
-                        <DialogActions className="notification_action">
-                            {this.actions()}
-                        </DialogActions>
-                    </Dialog>
-                </MuiThemeProvider>
+                <Dialog
+                    className={classes.root}
+                    open={this.state.open}
+                    fullWidth
+                >
+                    <DialogTitle>
+                        {this.props.notification.title}
+                    </DialogTitle>
+                    <DialogContent className={classes.content}>
+                        <div className={classes.contentDiv}>{this.props.notification.message}</div>
+                        {this.errors()}
+                    </DialogContent>
+                    <DialogActions>
+                        {this.actions()}
+                    </DialogActions>
+                </Dialog>
             );
         }
         return null;
@@ -200,6 +205,7 @@ NotifierDialog.propTypes = {
     handleNotificationDismiss: PropTypes.func,
     handleSessionWarning: PropTypes.func,
     adId: PropTypes.number,
+    classes: PropTypes.object.isRequired,
 };
 
-export default NotifierDialog;
+export default withStyles(styles)(NotifierDialog);
