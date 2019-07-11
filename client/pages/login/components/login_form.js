@@ -5,8 +5,10 @@ import { Link } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import FormGroup from '@material-ui/core/FormGroup';
 import PropTypes from 'prop-types';
-import { required, minLength, isEmail } from '../../../tools/validator';
-import { renderInput, renderCheckBox } from '../../../components/form_inputs';
+import {
+    required, minLength, isEmail, isSpace,
+} from '../../../tools/validator';
+import { renderInput, renderCheckBox, renderPassword } from '../../../components/form_inputs';
 import styles from '../styles';
 
 const minLength8 = minLength(8);
@@ -20,6 +22,8 @@ class LoginForm extends React.Component {
             submitting,
             error,
             submitLogin,
+            handleToggleVisiblePassword,
+            isPasswordMasked,
         } = this.props;
         if (error) {
             return (
@@ -47,12 +51,13 @@ class LoginForm extends React.Component {
                 <div className="form_input">
                     <Field
                         name="_password"
-                        type="password"
+                        type={isPasswordMasked ? 'password' : 'text'}
                         id="outlined-password"
                         label="Password"
                         variant="outlined"
-                        component={renderInput}
-                        validate={[required, minLength8]}
+                        component={renderPassword}
+                        validate={[required, isSpace, minLength8]}
+                        handleToggleVisiblePassword={handleToggleVisiblePassword}
                     />
                 </div>
                 <div id="captcha" />
@@ -92,6 +97,8 @@ LoginForm.propTypes = {
     error: PropTypes.any,
     classes: PropTypes.object.isRequired,
     handleSubmit: PropTypes.func.isRequired,
+    handleToggleVisiblePassword: PropTypes.func.isRequired,
+    isPasswordMasked: PropTypes.bool.isRequired,
     submitLogin: PropTypes.func.isRequired,
     invalid: PropTypes.bool.isRequired,
     submitting: PropTypes.bool.isRequired,

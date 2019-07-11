@@ -41,13 +41,14 @@ class PasswordResetRequestForm extends React.Component {
                 </div>
                 <div className="form_input">
                     <Button
-                        variant="outlined"
+                        variant="contained"
+                        fullWidth
                         color="primary"
                         disabled={submitting || invalid}
                         name="_submit"
                         type="submit"
                     >
-                            Reset password
+                        Reset password
                     </Button>
                 </div>
             </form>

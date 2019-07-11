@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { withRouter, Link } from 'react-router-dom';
 import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import localforage from 'localforage';
@@ -29,6 +30,7 @@ class Login extends React.Component {
         super(props);
         this.state = {
             isLoading: false,
+            isPasswordMasked: true,
             notification: {
                 status: '',
                 title: '',
@@ -151,6 +153,12 @@ class Login extends React.Component {
         }
     }
 
+    handleToggleVisiblePassword = () => {
+        this.setState(prevState => ({
+            isPasswordMasked: !prevState.isPasswordMasked,
+        }));
+    };
+
     handleNotificationDismiss = () => {
         this.setState({
             notification: {
@@ -163,7 +171,6 @@ class Login extends React.Component {
     }
 
     render() {
-        console.log('login props', this.props);
         const { classes } = this.props;
         if (this.props.online_status.isOnline) {
             return (
@@ -171,15 +178,22 @@ class Login extends React.Component {
                     <main id="login_page">
                         {this.state.isLoading ? <Loading /> : null}
                         <Card className={classes.root}>
-                            <CardContent
-                                className={classes.loginAction}
-                            >
-                                {this.props.location.state ? (
-                                    <Typography>
-                                        The page you tried to access
-                                        requires login.
+                            <CardHeader
+                                className={classes.header}
+                                title={(
+                                    <Typography className={classes.title} component="h3">
+                                        Login
+                                    </Typography>
+                                )}
+                                subheader={this.props.location.state ? (
+                                    <Typography className={classes.subheader}>
+                                        The page you tried to access requires login.
                                     </Typography>
                                 ) : null}
+                            />
+                            <CardContent
+                                className={classes.content}
+                            >
                                 <div className={classes.notMember}>
                                     <Link to="/registration">
                                         not yet a member? sign up
@@ -187,10 +201,15 @@ class Login extends React.Component {
                                 </div>
                                 <LoginForm
                                     submitLogin={this.onSubmitLogin}
+                                    isPasswordMasked={
+                                        this.state.isPasswordMasked
+                                    }
+                                    handleToggleVisiblePassword={
+                                        this.handleToggleVisiblePassword
+                                    }
                                 />
                             </CardContent>
                         </Card>
-
                         <NotifierDialog
                             notification={this.state.notification}
                             handleNotificationDismiss={

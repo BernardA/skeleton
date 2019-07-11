@@ -2,15 +2,18 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import LoadableVisibility from 'react-loadable-visibility/react-loadable';
+import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import { LoadingVisibility, Loading } from '../../components/loading';
 import PasswordResetRequestForm from './components/password_reset_request_form';
 import { actionRequestPasswordChange } from '../../store/actions';
 import NotifierDialog from '../../components/notifier_dialog';
 import NotifierInline from '../../components/notifier_inline';
+import styles from './styles';
 
 const Footer = LoadableVisibility({
     loader: () => import('../../components/footer'),
@@ -49,12 +52,21 @@ class PasswordResetRequest extends React.Component {
                     errors: {},
                 },
             });
-        }).catch((error) => {
-            console.log(error);
+        }).catch(() => {
+            this.setState({
+                isLoading: false,
+                notification: {
+                    status: 'error',
+                    title: 'Unknown error',
+                    message: 'Please try again',
+                    errors: {},
+                },
+            });
         });
     }
 
     handleNotificationDismiss = () => {
+        const status = this.state.notification.status;
         this.setState({
             notification: {
                 status: '',
@@ -63,10 +75,13 @@ class PasswordResetRequest extends React.Component {
                 errors: {},
             },
         });
-        this.props.history.push('/');
+        if (status === 'ok_and_dismiss') {
+            this.props.history.push('/');
+        }
     }
 
     render() {
+        const { classes } = this.props;
         if (this.props.online_status.isOnline) {
             return (
                 <React.Fragment>
@@ -76,11 +91,22 @@ class PasswordResetRequest extends React.Component {
                             :
                             null
                         }
-                        <Card>
-                            <CardContent>
-                                <Typography>
-                                    To reset password
-                                </Typography>
+                        <Card className={classes.root}>
+                            <CardHeader
+                                className={classes.header}
+                                title={(
+                                    <Typography className={classes.title} component="h3">
+                                        Password reset request
+                                    </Typography>
+                                )}
+                                subheader={(
+                                    <Typography className={classes.subheader} component="p">
+                                        Enter your email below
+                                    </Typography>
+                                )}
+                            />
+
+                            <CardContent className={classes.content}>
                                 <PasswordResetRequestForm
                                     requestPasswordChange={this.onSubmitPasswordResetRequest}
                                 />
@@ -108,6 +134,7 @@ PasswordResetRequest.propTypes = {
     password_reset_request_form: PropTypes.any,
     history: PropTypes.object.isRequired,
     online_status: PropTypes.object.isRequired,
+    classes: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -124,4 +151,7 @@ function mapDispatchToProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PasswordResetRequest);
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(withStyles(styles)(PasswordResetRequest));

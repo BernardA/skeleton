@@ -9,6 +9,8 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import RemoveRedEye from '@material-ui/icons/RemoveRedEye';
+import { InputAdornment } from '@material-ui/core';
 
 export const renderInput = (field) => {
     const { meta: { touched, error } } = field;
@@ -189,3 +191,38 @@ export const renderFileInput = ({
         {...props}
     />
 );
+
+export const renderPassword = (field) => {
+    const { meta: { touched, error, warning } } = field;
+    return (
+        <React.Fragment>
+            <TextField
+                type={field.type}
+                id={field.id}
+                label={field.label}
+                margin="none"
+                helperText={field.helperText}
+                fullWidth
+                onKeyUp={field.onKeyUp}
+                className={field.className}
+                placeholder={field.placeholder}
+                disabled={field.disabled}
+                autoFocus={field.autoFocus}
+                {...field.input}
+                variant={field.variant}
+                InputProps={{
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <RemoveRedEye
+                                onClick={field.handleToggleVisiblePassword}
+                                className="pointer"
+                            />
+                        </InputAdornment>
+                    ),
+                }}
+            />
+            <span className="form_error">{touched ? error : ''}</span>
+            <span className="form_warning">{touched ? warning : ''}</span>
+        </React.Fragment>
+    );
+};

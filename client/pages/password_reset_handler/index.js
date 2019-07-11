@@ -2,12 +2,18 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { withRouter } from 'react-router-dom';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
+import { withStyles } from '@material-ui/core/styles';
 import LoadableVisibility from 'react-loadable-visibility/react-loadable';
 import PropTypes from 'prop-types';
-import { LoadingVisibility } from '../../components/loading';
+import { LoadingVisibility, Loading } from '../../components/loading';
 import { actionSubmitPasswordResetToken, actionChangePassword } from '../../store/actions';
 import PasswordResetForm from './components/password_reset_form';
 import NotifierDialog from '../../components/notifier_dialog';
+import styles from './styles';
 
 const Footer = LoadableVisibility({
     loader: () => import('../../components/footer'),
@@ -18,7 +24,9 @@ class PasswordResetHandler extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            isLoading: false,
             active: false,
+            isPasswordMasked: true,
             notification: {
                 status: '',
                 title: '',
@@ -30,12 +38,14 @@ class PasswordResetHandler extends React.Component {
 
     componentDidMount() {
         console.log('password reset component did MOUNT');
+        this.setState({ isLoading: true });
         const getResetForm = new Promise((resolve) => {
             resolve(this.props.actionSubmitPasswordResetToken(this.props.match.params.token));
         });
         getResetForm.then((result) => {
             if (result.payload.data.status === 'error') {
                 this.setState({
+                    isLoading: false,
                     notification: {
                         status: 'error',
                         title: 'Token expired or invalid',
@@ -44,7 +54,10 @@ class PasswordResetHandler extends React.Component {
                     },
                 });
             } else {
-                this.setState({ active: true });
+                this.setState({
+                    isLoading: false,
+                    active: true,
+                });
             }
         }).catch((error) => {
             console.log(error);
@@ -60,6 +73,7 @@ class PasswordResetHandler extends React.Component {
     }
 
     onSubmitPasswordReset = () => {
+        this.setState({ isLoading: true });
         // this.setState({passwordResetResponse: {}});
         const submitForm = new Promise((resolve) => {
             resolve(this.props.actionChangePassword(
@@ -70,6 +84,7 @@ class PasswordResetHandler extends React.Component {
             if (result.payload.data.status === 'ok') {
                 console.log('payload.data', result.payload.data);
                 this.setState({
+                    isLoading: false,
                     notification: {
                         status: 'ok',
                         title: result.payload.data.message,
@@ -98,10 +113,11 @@ class PasswordResetHandler extends React.Component {
                         );
                     }
                 }
-                const errors = errors1.map((item, i) => {
-                    return <li key={i}>{item}</li>;
+                const errors = errors1.map((item) => {
+                    return <li key={item}>{item}</li>;
                 });
                 this.setState({
+                    isLoading: false,
                     notification: {
                         status: 'error',
                         title: 'An error has occurred:',
@@ -112,8 +128,22 @@ class PasswordResetHandler extends React.Component {
             }
         }).catch((error) => {
             console.log(error);
+            this.setState({
+                notification: {
+                    status: 'error',
+                    title: 'Unknown error',
+                    message: 'Please try again',
+                    errors: {},
+                },
+            });
         });
     }
+
+    handleToggleVisiblePassword = () => {
+        this.setState(prevState => ({
+            isPasswordMasked: !prevState.isPasswordMasked,
+        }));
+    };
 
     handleNotificationDismiss = () => {
         this.setState({
@@ -127,46 +157,48 @@ class PasswordResetHandler extends React.Component {
     }
 
     render() {
-        const isNotification = () => {
-            if (this.state.notification.status === 'error') {
-                return (
+        const { classes } = this.props;
+        return (
+            <React.Fragment>
+                <main>
+                    {this.state.isLoading ? <Loading /> : null}
+                    <Card className={classes.root}>
+                        <CardHeader
+                            className={classes.header}
+                            title={(
+                                <Typography className={classes.title} component="h3">
+                                    Password reset
+                                </Typography>
+                            )}
+                        />
+                        <CardContent
+                            className={classes.content}
+                        >
+                            {
+                                this.state.active ? (
+                                    <PasswordResetForm
+                                        onSubmitPasswordResetForm={this.onSubmitPasswordReset}
+                                        isPasswordMasked={
+                                            this.state.isPasswordMasked
+                                        }
+                                        handleToggleVisiblePassword={
+                                            this.handleToggleVisiblePassword
+                                        }
+                                    />
+                                )
+                                    :
+                                    null
+                            }
+                        </CardContent>
+                    </Card>
                     <NotifierDialog
                         notification={this.state.notification}
                         handleNotificationDismiss={this.handleNotificationDismiss}
                     />
-                );
-            }
-            return null;
-        };
-
-        const isForm = () => {
-            if (this.state.active) {
-                return (
-                    <React.Fragment>
-                        <PasswordResetForm onSubmitPasswordResetForm={this.onSubmitPasswordReset} />
-                        <div>
-                            <NotifierDialog
-                                notification={this.state.notification}
-                                handleNotificationDismiss={this.handleNotificationDismiss}
-                            />
-                        </div>
-                    </React.Fragment>
-                );
-            }
-            return null;
-        };
-        if (isNotification() != null || isForm() != null) {
-            return (
-                <React.Fragment>
-                    <main>
-                        {isNotification()}
-                        {isForm()}
-                    </main>
-                    <Footer />
-                </React.Fragment>
-            );
-        }
-        return null;
+                </main>
+                <Footer />
+            </React.Fragment>
+        );
     }
 }
 
@@ -176,6 +208,7 @@ PasswordResetHandler.propTypes = {
     match: PropTypes.object.isRequired,
     password_reset_form: PropTypes.any,
     history: PropTypes.object.isRequired,
+    classes: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -193,4 +226,7 @@ function mapDispatchToProps(dispatch) {
     }, dispatch);
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(PasswordResetHandler));
+export default withRouter(connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(withStyles(styles)(PasswordResetHandler)));

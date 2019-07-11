@@ -71,7 +71,7 @@ export const isPlaceFormat = (value) => {
 
 export const isSpace = value => (
     value && /\s/.test(value)
-        ? "Avertissement: Il y a d'espaces sur le mot de passe. Vérifiez svp"
+        ? 'Espaces ne sont pas permis sur le mot de passe'
         : undefined
 );
 

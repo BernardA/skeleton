@@ -7,7 +7,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-// import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import styles from './styles';
 
@@ -19,7 +18,6 @@ const DialogTitle = withStyles(styles)((props) => {
         </MuiDialogTitle>
     );
 });
-
 
 class NotifierDialog extends React.Component {
     constructor(props) {
@@ -179,7 +177,7 @@ class NotifierDialog extends React.Component {
         if (this.props.notification.status !== '') {
             return (
                 <Dialog
-                    className={classes.root}
+                    className={classes.paperFullWidth}
                     open={this.state.open}
                     fullWidth
                 >
@@ -187,10 +185,12 @@ class NotifierDialog extends React.Component {
                         {this.props.notification.title}
                     </DialogTitle>
                     <DialogContent className={classes.content}>
-                        <div className={classes.contentDiv}>{this.props.notification.message}</div>
+                        <div className={classes.contentDiv}>
+                            {this.props.notification.message}
+                        </div>
                         {this.errors()}
                     </DialogContent>
-                    <DialogActions>
+                    <DialogActions className={classes.actions}>
                         {this.actions()}
                     </DialogActions>
                 </Dialog>

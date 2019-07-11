@@ -57,6 +57,14 @@ api_address_change:
     path: /api-address/change
     controller: App\Controller\ApiAddressController::AddressChangeAction
 
+api_resetting_check_token:
+    path: /api-resetting/check-token/{token}
+    controller: App\Controller\ResettingController::resetAction
+
+api_resetting_reset:
+    path: /api-resetting/reset/{token}
+    controller: App\Controller\ResettingController::resetAction
+
 fos_user_registration_register:
     path:      /register/
     controller: App\Controller\RegistrationController::registerAction

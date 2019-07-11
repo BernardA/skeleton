@@ -3,7 +3,9 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { withRouter, Link } from 'react-router-dom';
 import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import LoadableVisibility from 'react-loadable-visibility/react-loadable';
 import PropTypes from 'prop-types';
@@ -27,6 +29,7 @@ class Register extends React.Component {
         super(props);
         this.state = {
             isLoading: false,
+            isPasswordMasked: true,
             notification: {
                 status: '',
                 title: '',
@@ -116,6 +119,12 @@ class Register extends React.Component {
         });
     }
 
+    handleToggleVisiblePassword = () => {
+        this.setState(prevState => ({
+            isPasswordMasked: !prevState.isPasswordMasked,
+        }));
+    };
+
     handleNotificationDismiss = () => {
         const status = this.state.notification.status;
         this.setState({
@@ -143,12 +152,26 @@ class Register extends React.Component {
                             null
                         }
                         <Card className={classes.root}>
-                            <CardContent className={classes.loginAction}>
+                            <CardHeader
+                                className={classes.header}
+                                title={(
+                                    <Typography className={classes.title} component="h3">
+                                            Registration
+                                    </Typography>
+                                )}
+                            />
+                            <CardContent className={classes.content}>
                                 <div className={classes.notMember}>
                                     <Link to="/login">already a member? login </Link>
                                 </div>
                                 <RegisterForm
                                     submitRegister={this.onSubmitRegister}
+                                    isPasswordMasked={
+                                        this.state.isPasswordMasked
+                                    }
+                                    handleToggleVisiblePassword={
+                                        this.handleToggleVisiblePassword
+                                    }
                                 />
                             </CardContent>
                         </Card>

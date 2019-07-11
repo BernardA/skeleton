@@ -13,29 +13,14 @@ export default () => {
         title: {
             textTransform: 'uppercase',
         },
+        subheader: {
+            fontSize: '12px',
+            marginTop: '10px',
+        },
         content: {
             maxWidth: '350px',
             margin: '40px auto',
             padding: 0,
-        },
-        notMember: {
-            margin: '20px 0',
-            textAlign: 'center',
-        },
-        container: {
-            display: 'flex',
-            flexWrap: 'wrap',
-        },
-        button: {
-            margin: '20px 0',
-        },
-        formGroup: {
-            marginRight: 0,
-            justifyContent: 'space-between',
-            lineHeight: '45px',
-        },
-        lineWrapSpan: {
-            display: 'block',
         },
     });
 };

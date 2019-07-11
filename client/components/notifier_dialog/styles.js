@@ -1,7 +1,8 @@
 export default () => {
     return ({
-        root: {
+        paperFullWidth: {
             margin: 0,
+            width: '100%',
         },
         title: {
             backgroundColor: '#de1b',
@@ -19,6 +20,9 @@ export default () => {
         },
         buttonLeft: {
             marginLeft: '10px',
+        },
+        actions: {
+            minHeight: '50px',
         },
     });
 };

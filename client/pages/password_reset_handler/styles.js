@@ -18,24 +18,5 @@ export default () => {
             margin: '40px auto',
             padding: 0,
         },
-        notMember: {
-            margin: '20px 0',
-            textAlign: 'center',
-        },
-        container: {
-            display: 'flex',
-            flexWrap: 'wrap',
-        },
-        button: {
-            margin: '20px 0',
-        },
-        formGroup: {
-            marginRight: 0,
-            justifyContent: 'space-between',
-            lineHeight: '45px',
-        },
-        lineWrapSpan: {
-            display: 'block',
-        },
     });
 };

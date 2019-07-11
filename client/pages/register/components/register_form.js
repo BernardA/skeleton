@@ -7,9 +7,9 @@ import Typography from '@material-ui/core/Typography';
 import PropTypes from 'prop-types';
 import FormGroup from '@material-ui/core/FormGroup';
 import {
-    required, minLength, maxLength, isEmail, isMatchPassword, rgpd,
+    required, minLength, maxLength, isEmail, isMatchPassword, rgpd, isSpace,
 } from '../../../tools/validator';
-import { renderInput, renderCheckBox } from '../../../components/form_inputs';
+import { renderInput, renderCheckBox, renderPassword } from '../../../components/form_inputs';
 import styles from '../styles';
 
 // validation like maxLength(n) will cause errors as per https://github.com/erikras/redux-form/issues/4017#issuecomment-386788539
@@ -32,6 +32,8 @@ class RegisterForm extends React.Component {
             reset,
             pristine,
             submitRegister,
+            handleToggleVisiblePassword,
+            isPasswordMasked,
         } = this.props;
 
         if (error) {
@@ -70,23 +72,25 @@ class RegisterForm extends React.Component {
                 <div className="form_input">
                     <Field
                         name="fos_user_registration_form[plainPassword][first]"
-                        type="password"
+                        type={isPasswordMasked ? 'password' : 'text'}
                         id="outlined-password"
                         label="Password"
                         variant="outlined"
-                        component={renderInput}
-                        validate={[required, minLength8]}
+                        component={renderPassword}
+                        validate={[required, minLength8, isSpace]}
+                        handleToggleVisiblePassword={handleToggleVisiblePassword}
                     />
                 </div>
                 <div className="form_input">
                     <Field
                         name="fos_user_registration_form[plainPassword][second]"
-                        type="password"
+                        type={isPasswordMasked ? 'password' : 'text'}
                         id="outlined-password_confirmation"
                         label="Password confirmation"
                         variant="outlined"
-                        component={renderInput}
-                        validate={[required, isMatchPlainPasswordFirst]}
+                        component={renderPassword}
+                        validate={[required, isSpace, isMatchPlainPasswordFirst]}
+                        handleToggleVisiblePassword={handleToggleVisiblePassword}
                     />
                 </div>
                 <div className="form_input">
@@ -201,6 +205,8 @@ RegisterForm.propTypes = {
     submitRegister: PropTypes.func.isRequired,
     classes: PropTypes.object.isRequired,
     handleSubmit: PropTypes.func.isRequired,
+    handleToggleVisiblePassword: PropTypes.func.isRequired,
+    isPasswordMasked: PropTypes.bool.isRequired,
     submitting: PropTypes.bool.isRequired,
     invalid: PropTypes.bool.isRequired,
     reset: PropTypes.func.isRequired,
