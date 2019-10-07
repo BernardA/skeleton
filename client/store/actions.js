@@ -2,15 +2,11 @@ import axios from 'axios';
 
 export const CHECK_SESSION = 'CHECK_SESSION';
 
-export function actionCheckSession(payload) {
+export function actionCheckSession() {
     const url = '/api-session';
-
-    const data = {
-        payload,
-    };
     return {
         type: CHECK_SESSION,
-        payload: axios.post(url, data),
+        payload: axios.get(url),
     };
 }
 

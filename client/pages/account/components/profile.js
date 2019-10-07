@@ -182,20 +182,6 @@ const Profile = (props) => {
                 ) : (
                     <NotifierInline message="You seem to be offline. Profile changes are disabled." />
                 )}
-
-                <Typography variant="h6" gutterBottom>
-                    Profile image
-                </Typography>
-                {profile.xtra.img_file ? (
-                    <div id="profile_image">
-                        <img
-                            src={`/uploads/user_image/${
-                                profile.xtra.img_file
-                            }`}
-                            alt="profile"
-                        />
-                    </div>
-                ) : null}
             </React.Fragment>
         );
     }

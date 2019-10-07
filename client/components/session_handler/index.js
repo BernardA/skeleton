@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import localforage from 'localforage';
+import { withCookies } from 'react-cookie';
 import PropTypes from 'prop-types';
 import {
     actionGetInitialDataForOffline,
@@ -32,8 +33,10 @@ will check on the server side if the session idle flag exists
 10 - if so, it will show a message like" logged out due to inactivity"
 
 */
+const MAX_IDLE_TIME_SERVER = 18000; // 5 hours
 const MAX_IDLE_TIME = 3600; // 5+ hours = set to 10 hours or higher on server
 const BUFFER = 300000; // milliseconds before MAX_IDLE_TIME expiration
+
 class SessionHandler extends React.Component {
     constructor(props) {
         super(props);
@@ -56,33 +59,55 @@ class SessionHandler extends React.Component {
         // this.getSessionLastActive(this.state.checkInterval);
         // get last active on indexeddb
         // if longer than MAX_IDLE_TIME logout
-        localforage.getItem('last_active_server').then((value) => {
-            if (value && value + MAX_IDLE_TIME < Now()) {
-                this.onLogout();
-            } else {
-                this.sessionLastActiveInterval = setInterval(
-                    this.getSessionLastActive,
-                    this.state.checkInterval,
-                );
-                // if is homepage check if session idle logout flag exists on server
-                // this was meant to trigger only after /logout,
-                // but still not able to find a way to get the correct referrer info
-                if (this.props.location.pathname === '/') {
-                    this.checkSessionAfterLogoutRedirect();
+        const { allCookies } = this.props;
+        if (allCookies.session) {
+            localforage.getItem('last_active').then((value) => {
+                if (value) {
+                    const last = value.client > value.server ? value.client : value.server;
+                    if (last + MAX_IDLE_TIME < Now()) {
+                        this.onLogout();
+                    } else {
+                        this.sessionLastActiveInterval = setInterval(
+                            this.getSessionLastActive,
+                            this.state.checkInterval,
+                        );
+                    }
+                } else { // as session exists and, for any reason, last_active doesn't, then set it
+                    localforage.setItem('last_active', { server: Now(), client: Now() });
                 }
-            }
-        });
+            });
+        } else {
+            // if there is no session clear interval, listener
+            clearInterval(this.sessionLastActiveInterval);
+            window.removeEventListener('isOnline', this.getSessionLastActive);
+        }
+        // if is homepage check if session idle logout flag exists on server
+        // this was meant to trigger only after /logout,
+        // but still not able to find a way to get the correct referrer info
+        if (this.props.location.pathname === '/') {
+            this.checkSessionAfterLogoutRedirect();
+        }
     }
 
     componentDidUpdate(prevProps) {
         if (prevProps.location.pathname !== this.props.location.pathname) {
-            localforage.getItem('last_active_server').then((value) => {
-                if (value && value + MAX_IDLE_TIME < Now()) {
-                    this.onLogout();
-                } else {
-                    localforage.setItem('last_active_client', Now());
-                }
-            });
+            const { allCookies } = this.props;
+            if (allCookies.session) {
+                localforage.getItem('last_active').then((value) => {
+                    if (value) {
+                        const last = value.client > value.server ? value.client : value.server;
+                        if (last + MAX_IDLE_TIME < Now()) {
+                            this.onLogout();
+                        } else {
+                            const newLast = value;
+                            newLast.client = Now();
+                            localforage.setItem('last_active', newLast);
+                        }
+                    } else { // as session exists and, for any reason, last_active doesn't, set it
+                        localforage.setItem('last_active', { server: Now(), client: Now() });
+                    }
+                });
+            }
         }
     }
 
@@ -93,7 +118,6 @@ class SessionHandler extends React.Component {
 
     checkSessionAfterLogoutRedirect = () => {
         // this is the check if it was an idle logout and show notification
-        // THIS DOES NOT WORK WITHOUT MEMCACHED ON SERVER SIDE - USING INDEXEDDB INSTEAD
         localforage.getItem('idle_logout_flag').then((value) => {
             if (value) {
                 this.setState({
@@ -114,153 +138,50 @@ class SessionHandler extends React.Component {
 
     onLogout = () => {
         // sets the session idle logout flag on memcached that will be checked on componentDidMount
-        // THIS DOES NOT WORK ON SERVER WITHOUT MEMCACHED - PUT FLAG ON INDEXEDDB INSTEAD
         localforage.setItem('idle_logout_flag', 1);
-        const getApiSession = new Promise((resolve) => {
-            resolve(
-                this.props.actionCheckSession('set_session_idle_logout_flag'),
-            );
+        clearInterval(this.sessionLastActiveInterval);
+        this.setState({
+            activeSessionDialog: false,
+            action: 'logout',
         });
-        getApiSession
-            .then(() => {
-                // even if an error occurs on server side user should be logged out
-                this.setState({
-                    activeSessionDialog: false,
-                    action: 'logout',
-                });
-            })
-            .catch((error) => {
-                console.log(error);
-            });
     };
 
     getSessionLastActive = () => {
-        const getApiSession = new Promise((resolve) => {
-            resolve(this.props.actionCheckSession(0));
+        localforage.getItem('last_active').then((value) => {
+            if (value) {
+                const last = value.client > value.server ? value.client : value.server;
+                const expire = last + MAX_IDLE_TIME;
+                if (expire <= Now()) { // if expired log out
+                    this.onLogout();
+                } else if (!this.state.isDialogShown && expire <= Now() + BUFFER / 1000) {
+                    // if within the buffer, show dialog
+                    this.setState({
+                        action: 'show_session_expire_warning',
+                        notification: {
+                            status: 'show_session_expire_warning',
+                            title: 'Sécurité',
+                            message: 'Vous serez déconnecté par manque d’activité',
+                            errors: {},
+                        },
+                        activeSessionDialog: true,
+                        isDialogShown: true,
+                    });
+                }
+                // in the unlikely case that server is close to MAX_IDLE_TIME_SERVER
+                // generate a request to refresh it
+                if (value.server + MAX_IDLE_TIME_SERVER < Now() + 3600) {
+                    this.makeRealRequestToRefreshServerSession();
+                }
+                // this is attempt to check server session and logout if none exists
+                // after one hour server inactivity
+                if (value.server + 3600 < Now()) {
+                    this.checkIsLoggedOnServer();
+                }
+            } else { // if, for any reason, last_active is not stored, set it
+                localforage.setItem('last_active', { server: Now(), client: Now() });
+            }
         });
-        getApiSession
-            .then((result) => {
-                const data = result.payload.data;
-                console.log('check session result', result);
-                localforage.getItem('bda_session').then((value) => {
-                    if (value && !data.is_logged) {
-                        this.setState({
-                            action: 'logout',
-                        });
-                        localforage.setItem('idle_logout_flag', 1);
-                    } else if (value && data.is_logged) {
-                        console.log('get session last active');
-                        // window.removeEventListener("isOnline", this.getSessionLastActive);
-                        localforage.getItem('bda_session').then((value1) => {
-                            console.log('last active bda session', value1);
-                            if (value1) {
-                                localforage
-                                    .getItem('last_active_client')
-                                    .then((client) => {
-                                        if (client) {
-                                            console.log(
-                                                'last active client',
-                                                client,
-                                            );
-                                            localforage
-                                                .getItem('last_active_server')
-                                                .then((server) => {
-                                                    console.log(
-                                                        'last active server',
-                                                        server,
-                                                    );
-                                                    if (server) {
-                                                        // set expire to the most recent of
-                                                        // server or client + max idle time
-                                                        const expireServer =
-                                                            server +
-                                                            MAX_IDLE_TIME;
-                                                        const expire =
-                                                            client +
-                                                                MAX_IDLE_TIME >
-                                                            expireServer
-                                                                ? client +
-                                                                  MAX_IDLE_TIME
-                                                                : expireServer;
-                                                        // check if is close to expire on the
-                                                        // server side and refresh it if necessary
-                                                        console.log(
-                                                            'last active expire',
-                                                            expire,
-                                                        );
-                                                        console.log(
-                                                            'last active NOW',
-                                                            Now(),
-                                                        );
-                                                        console.log(
-                                                            'Now() + BUFFER / 1000',
-                                                            Now() +
-                                                                BUFFER / 1000,
-                                                        );
-                                                        if (expire <= Now()) {
-                                                            // if expires has passed should be
-                                                            // logged out,though this should
-                                                            // not happen if below is done properly
-                                                            this.onLogout();
-                                                        } else if (
-                                                            !this.state
-                                                                .isDialogShown &&
-                                                            expire <=
-                                                                Now() +
-                                                                    BUFFER /
-                                                                        1000
-                                                        ) {
-                                                            // if within the buffer, show dialog
-                                                            this.setState({
-                                                                action:
-                                                                    'show_session_expire_warning',
-                                                                notification: {
-                                                                    status:
-                                                                        'show_session_expire_warning',
-                                                                    title:
-                                                                        'Sécurité',
-                                                                    message:
-                                                                        'Vous serez déconnecté par manque d’activité',
-                                                                    errors: {},
-                                                                },
-                                                                activeSessionDialog: true,
-                                                                isDialogShown: true,
-                                                            });
-                                                        } else {
-                                                            // should be close to get to buffer,
-                                                            // so recalculate checkInterval
-                                                            console.log(
-                                                                'client - server > MAX_IDLE_TIME * 1000 - BUFFER',
-                                                                client -
-                                                                    server >
-                                                                    MAX_IDLE_TIME *
-                                                                        1000 -
-                                                                        BUFFER,
-                                                            );
-                                                            if (
-                                                                client -
-                                                                    server >
-                                                                MAX_IDLE_TIME *
-                                                                    1000 -
-                                                                    BUFFER
-                                                            ) {
-                                                                // eslint-disable-next-line max-len
-                                                                this.makeRealRequestToRefreshServerSession();
-                                                            }
-                                                        }
-                                                    }
-                                                });
-                                        }
-                                    });
-                            }
-                        });
-                    }
-                });
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    };
+    }
 
     handleSessionWarning = (event) => {
         // close dialog
@@ -275,25 +196,9 @@ class SessionHandler extends React.Component {
             },
         });
         const buttonId = event.target.id;
-        // if user clicks on extend then update last active on server
+        // if user clicks on extend then refresh last_active with request
         if (buttonId === 'session_extend') {
-            const getApiSession = new Promise((resolve) => {
-                resolve(this.props.actionCheckSession('extend'));
-            });
-            getApiSession
-                .then((result) => {
-                    if (!result.payload.data.is_logged) {
-                        this.onLogout();
-                    } else {
-                        this.setState({
-                            isDialogShown: false,
-                        });
-                        this.makeRealRequestToRefreshServerSession();
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+            this.makeRealRequestToRefreshServerSession();
         }
     };
 
@@ -303,7 +208,6 @@ class SessionHandler extends React.Component {
         });
         newPromise
             .then((result) => {
-                localforage.setItem('last_active_server', Now());
                 const data = result.payload.data;
                 // set indexeddb
                 localforage.setItem('timestamp-initialdata', new Date());
@@ -314,11 +218,23 @@ class SessionHandler extends React.Component {
             });
     };
 
+    checkIsLoggedOnServer = () => {
+        const check = new Promise((resolve) => {
+            resolve(this.props.actionCheckSession());
+        });
+        check.then((response) => {
+            console.log('response', response);
+            const data = response.payload.data;
+            if (!data.is_logged) {
+                this.onLogout();
+            }
+        }).catch((error) => {
+            console.log('error', error);
+        });
+    }
+
     render() {
         if (this.state.action === 'logout') {
-            localforage.removeItem('bda_session');
-            localforage.removeItem('last_active_client');
-            localforage.removeItem('last_active_server');
             // eslint-disable-next-line no-restricted-globals
             location.assign('/logout');
             return null;
@@ -340,9 +256,10 @@ class SessionHandler extends React.Component {
 }
 
 SessionHandler.propTypes = {
+    allCookies: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
-    actionCheckSession: PropTypes.func.isRequired,
     actionGetInitialDataForOffline: PropTypes.func.isRequired,
+    actionCheckSession: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -361,7 +278,7 @@ function mapDispatchToProps(dispatch) {
     );
 }
 
-export default connect(
+export default withCookies(connect(
     mapStateToProps,
     mapDispatchToProps,
-)(SessionHandler);
+)(SessionHandler));

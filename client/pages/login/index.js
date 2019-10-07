@@ -45,6 +45,7 @@ class Login extends React.Component {
         const submitForm = new Promise((resolve) => {
             resolve(this.props.actionLogin(this.props.login_form.values));
         });
+        console.log('login value', this.props.login_form.values);
         submitForm.then((result) => {
             console.log('login result', result);
             this.handlePostSubmitLogin(result);
@@ -114,8 +115,7 @@ class Login extends React.Component {
                     },
                 });
                 localforage.setItem('bda_session', result.payload.data.session_info);
-                localforage.setItem('last_active_client', Now());
-                localforage.setItem('last_active_server', Now());
+                localforage.setItem('last_active', { server: Now(), client: Now() });
                 // SET COOKIES
                 const { cookies } = this.props;
                 cookies.set('session', result.payload.data.session_info, { path: '/' });

@@ -14,6 +14,7 @@ import Meta from './components/meta';
 import Header from './components/header';
 import { Loading } from './components/loading';
 import ErrorBoundary from './components/error_boundary';
+import { Now } from './tools/functions';
 
 
 const Fallback = (Component) => {
@@ -86,6 +87,19 @@ class Root extends React.Component {
                 axios.defaults.headers.post['X-XSRF-TOKEN'] =
                     result.data.csrfToken; // Set it in header for the rest of the axios requests.
             });
+        // add interceptor to axios to update last_active_server
+        const instance = axios.create();
+        instance.interceptors.request.use((config) => {
+            localforage.getItem('last_active').then((value) => {
+                if (value) {
+                    const last = value;
+                    last.server = Now();
+                    localforage.setItem('last_active', last);
+                }
+                localforage.setItem('last_active', { server: Now(), client: Now() });
+                return config;
+            });
+        });
     }
 
     componentWillUnmount() {
