@@ -24,7 +24,6 @@ class PasswordResetHandler extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isLoading: false,
             active: false,
             isPasswordMasked: true,
             notification: {
@@ -38,29 +37,33 @@ class PasswordResetHandler extends React.Component {
 
     componentDidMount() {
         console.log('password reset component did MOUNT');
-        this.setState({ isLoading: true });
-        const getResetForm = new Promise((resolve) => {
-            resolve(this.props.actionSubmitPasswordResetToken(this.props.match.params.token));
-        });
-        getResetForm.then((result) => {
-            if (result.payload.data.status === 'error') {
-                this.setState({
-                    isLoading: false,
-                    notification: {
-                        status: 'error',
-                        title: 'Token expired or invalid',
-                        message: 'Try to login or request a new password once more.',
-                        errors: {},
-                    },
-                });
-            } else {
-                this.setState({
-                    isLoading: false,
-                    active: true,
-                });
-            }
-        }).catch((error) => {
-            console.log(error);
+        if (this.props.match.params.token) {
+            this.props.actionSubmitPasswordResetToken(this.props.match.params.token);
+        } else {
+            this.setState({
+                notification: {
+                    status: 'error',
+                    title: 'Error',
+                    message: 'Missing token',
+                    errors: {},
+                },
+            });
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        const {
+            dataChangePassword,
+            dataResetToken,
+            errorResetToken,
+            errorChangePassword,
+        } = this.props;
+        if (!prevProps.dataResetToken && dataResetToken) {
+            this.setState({
+                active: true,
+            });
+        }
+        if (!prevProps.errorResetToken && errorResetToken) {
             this.setState({
                 notification: {
                     status: 'error',
@@ -69,74 +72,36 @@ class PasswordResetHandler extends React.Component {
                     errors: {},
                 },
             });
-        });
-    }
-
-    onSubmitPasswordReset = () => {
-        this.setState({ isLoading: true });
-        // this.setState({passwordResetResponse: {}});
-        const submitForm = new Promise((resolve) => {
-            resolve(this.props.actionChangePassword(
-                this.props.password_reset_form.values, this.props.match.params.token,
-            ));
-        });
-        submitForm.then((result) => {
-            if (result.payload.data.status === 'ok') {
-                console.log('payload.data', result.payload.data);
-                this.setState({
-                    isLoading: false,
-                    notification: {
-                        status: 'ok',
-                        title: result.payload.data.message,
-                        message: 'You will be redirected to login page',
-                        errors: {},
-                    },
-                });
-                // redirect user after timeout for notification
-                setTimeout(() => {
-                    this.props.history.push('/login');
-                }, 3000);
-            } else if (result.payload.data.status === 'error') {
-                const errors1 = [];
-                for (const key in result.payload.data.message) {
-                    if (
-                        Object.prototype.hasOwnProperty
-                            .call(
-                                result.payload.data.message,
-                                key,
-                            )
-                    ) {
-                        errors1.push(
-                            result.payload.data.message[
-                                key
-                            ],
-                        );
-                    }
-                }
-                const errors = errors1.map((item) => {
-                    return <li key={item}>{item}</li>;
-                });
-                this.setState({
-                    isLoading: false,
-                    notification: {
-                        status: 'error',
-                        title: 'An error has occurred:',
-                        message: '',
-                        errors,
-                    },
-                });
-            }
-        }).catch((error) => {
-            console.log(error);
+        }
+        if (!prevProps.dataChangePassword && dataChangePassword) {
             this.setState({
                 notification: {
-                    status: 'error',
-                    title: 'Unknown error',
-                    message: 'Please try again',
+                    status: 'ok',
+                    title: dataChangePassword.message,
+                    message: 'You will be redirected to login page',
                     errors: {},
                 },
             });
-        });
+            // redirect user after timeout for notification
+            setTimeout(() => {
+                this.props.history.push('/login');
+            }, 3000);
+        }
+        if (!prevProps.errorChangePassword && errorChangePassword) {
+            this.setState({
+                notification: {
+                    status: 'error',
+                    title: 'An error has occurred:',
+                    message: '',
+                    errors: {},
+                },
+            });
+        }
+    }
+
+    onSubmitPasswordReset = () => {
+        const { passwordResetForm, match } = this.props;
+        this.props.actionChangePassword(passwordResetForm.values, match.params.token);
     }
 
     handleToggleVisiblePassword = () => {
@@ -157,11 +122,11 @@ class PasswordResetHandler extends React.Component {
     }
 
     render() {
-        const { classes } = this.props;
+        const { classes, isLoading } = this.props;
         return (
             <React.Fragment>
                 <main>
-                    {this.state.isLoading ? <Loading /> : null}
+                    {isLoading ? <Loading /> : null}
                     <Card className={classes.root}>
                         <CardHeader
                             className={classes.header}
@@ -205,17 +170,24 @@ class PasswordResetHandler extends React.Component {
 PasswordResetHandler.propTypes = {
     actionSubmitPasswordResetToken: PropTypes.func.isRequired,
     actionChangePassword: PropTypes.func.isRequired,
+    passwordResetForm: PropTypes.any,
     match: PropTypes.object.isRequired,
-    password_reset_form: PropTypes.any,
     history: PropTypes.object.isRequired,
     classes: PropTypes.object.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+    dataChangePassword: PropTypes.any,
+    dataResetToken: PropTypes.any,
+    errorResetToken: PropTypes.any,
+    errorChangePassword: PropTypes.any,
 };
 
 const mapStateToProps = (state) => {
     return {
-        password_reset_form: state.form.PasswordResetForm,
-        submitPasswordResetToken: state.submitPasswordResetToken,
-        changePassword: state.changePassword,
+        passwordResetForm: state.form.PasswordResetForm,
+        dataResetToken: state.auth.dataResetToken,
+        dataChangePassword: state.auth.dataChangePassword,
+        errorResetToken: state.auth.errorResetToken,
+        errorChangePassword: state.auth.errorChangePassword,
     };
 };
 

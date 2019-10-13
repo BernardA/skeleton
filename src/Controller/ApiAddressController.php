@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use App\Service\MiscServices;
 use App\Security\FormLoginAuthenticator;
+use Symfony\Component\HttpFoundation\Response;
 
 class ApiAddressController extends Controller
 {
@@ -47,15 +48,13 @@ class ApiAddressController extends Controller
             $this->em->persist($address);
             $this->em->flush();
             return $this->json(array(
-                'status' => 'ok',
-                'address_id' => $address->getId(),
+                'addressId' => $address->getId(),
             ));
         }
         $errors = $this->miscServices->getErrorMessages($form);
         return $this->json(array(
-            'status' => 'error',
             'errors' => $errors,
-        ));
+        ), Response::HTTP_BAD_REQUEST);
     }
 
     public function AddressChangeAction(Request $request, FormLoginAuthenticator $formLoginAuthenticator)
@@ -69,18 +68,16 @@ class ApiAddressController extends Controller
 
         if ($requestToken != $sessionToken) {
             return $this->json(array(
-                'status' => 'error',
                 'error' => 'Invalid Token'
-            ));
+            ), Response::HTTP_UNAUTHORIZED);
         }
         if (!$this->isLogged) {
             $err_msg = [];
             $err_msg['not_allowed'] = 'You are not authorized to access this page';
             return $this->json(array(
-                'status' => 'error',
-                'is_logged' => $this->isLogged,
+                'isLogged' => $this->isLogged,
                 'errors' => $err_msg,
-            ));
+            ), Response::HTTP_UNAUTHORIZED);
         }
         $address = $this->user->getAddress();
         $form = $this->createForm('App\Form\AddressType', $address);
@@ -96,17 +93,15 @@ class ApiAddressController extends Controller
             $profile = $formLoginAuthenticator->getProfile($this->user);
 
             return $this->json(array(
-                'status' => 'ok',
                 'profile' => $profile
             ));
         } catch (\Exception $e) {
             if (!$form->isValid()) {
                 $errors = $this->miscServices->getErrorMessages($form);
                 return $this->json(array(
-                    'status' => 'error',
                     'errors' => $errors,
                     'errorException' => $e->getMessage(),
-                ));
+                ), Response::HTTP_BAD_REQUEST);
             }
         }
     }

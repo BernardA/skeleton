@@ -28,7 +28,7 @@ class InitializerListener
 		if ($eventR->isMasterRequest() && '_wdt' !== $route ) {
             $response  = $eventR->getResponse();
 	        if( isset($this->setCookieVisitor) && $this->setCookieVisitor == 1 ){
-	        	$response->headers->setCookie(new Cookie('visitor_own', time() + (365 * 24 * 60 * 60) ));
+	        	$response->headers->setCookie(new Cookie('visitor_own', null, time() + (365 * 24 * 60 * 60) ));
 	        }
     	}
     }

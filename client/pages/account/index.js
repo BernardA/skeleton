@@ -33,9 +33,6 @@ class Account extends React.Component {
             selectedFile: null,
             selectedFileMimeType: null,
             selectedFileName: null,
-            imageUploadResponse: [],
-            uploadErrors: [],
-            getProfileResponse: {},
             isActiveChangeAddressForm: false,
             notification: {
                 status: '',
@@ -48,11 +45,11 @@ class Account extends React.Component {
 
     componentDidMount() {
         console.log('account props', this.props);
+        const { dataOfflineUser, dataSession } = this.props;
         let username = null;
-        if (this.props.checkSession.data) {
-            username = { username: this.props.checkSession.data.username };
+        if (dataSession) {
+            username = { username: dataSession.username };
         }
-
         if (!username) {
             localforage.getItem('bda_session').then((value) => {
                 console.log('localforage.getItem', value);
@@ -64,12 +61,11 @@ class Account extends React.Component {
 
         const setStates = (data) => {
             this.setState({
-                getProfileResponse: data,
                 username: data.username,
             });
         };
-        if (this.props.user_data_for_offline.data) {
-            setStates(this.props.user_data_for_offline.data.profile);
+        if (dataOfflineUser) {
+            setStates(dataOfflineUser.profile);
         } else {
             // data is not in state => check if in indexeddb
             localforage.getItem('profile').then((value) => {
@@ -91,12 +87,59 @@ class Account extends React.Component {
 
     componentDidUpdate(prevProps) {
         console.log('update account props', this.props);
+        const {
+            dataOfflineUser,
+            dataUpload,
+            errorUpload,
+            errorAddress,
+            dataAddress,
+        } = this.props;
         // capture user data from dispatched getUserData below
-        if (prevProps.user_data_for_offline !== this.props.user_data_for_offline) {
-            const data = this.props.user_data_for_offline.data.profile;
+        if (!prevProps.dataOfflineUser && dataOfflineUser) {
             this.setState({
-                getProfileResponse: data,
-                username: data.username,
+                username: dataOfflineUser.profile.username,
+            });
+        }
+        if (!prevProps.dataUpload && dataUpload) {
+            // dispatch event to get user data from header component
+            const username = { username: this.state.username };
+            const getUserData = new CustomEvent('get_user_data', {
+                detail: {
+                    username,
+                },
+            });
+            window.dispatchEvent(getUserData);
+            this.handleDeleteFileSelected();
+        }
+        if (!prevProps.errorUpload && errorUpload) {
+            this.setState({
+                notification: {
+                    status: 'error',
+                    title: 'Error',
+                    message: 'Please correct errors below.',
+                    errors: errorUpload,
+                },
+            });
+        }
+        if (!prevProps.errorAddress && errorAddress) {
+            this.setState({
+                notification: {
+                    status: 'error',
+                    title: 'Error',
+                    message: 'Please correct errors below.',
+                    errors: errorUpload,
+                },
+            });
+        }
+        if (prevProps.dataAddress && dataAddress) {
+            this.setState({
+                isActiveChangeAddressForm: false,
+                notification: {
+                    status: 'ok_and_dismiss',
+                    title: 'Success.',
+                    message: 'Your changes were processed.',
+                    errors: {},
+                },
             });
         }
     }
@@ -149,73 +192,16 @@ class Account extends React.Component {
 
     handleImageUploadFormSubmit = (event) => {
         event.preventDefault();
-        this.setState({ imageUploadResponse: {} });
         const fileExtension = extractImageFileExtensionFromBase64(this.state.selectedFile);
         const filename = `${this.state.selectedFileName}.${fileExtension}`;
         const formData = new FormData();
         formData.append('form[imgFile]', filename);
-        const submitForm = new Promise((resolve) => {
-            resolve(this.props.actionUploadImage(formData));
-        });
-
-        submitForm.then((result) => {
-            this.setState({ imageUploadResponse: result.payload.data });
-            if (result.payload.data.status === 'ok') {
-                // dispatch event to get user data from header component
-                const username = { username: this.state.username };
-                const getUserData = new CustomEvent('get_user_data', {
-                    detail: {
-                        username,
-                    },
-                });
-                window.dispatchEvent(getUserData);
-                this.handleDeleteFileSelected();
-            } else {
-                this.setState({
-                    notification: {
-                        status: 'error',
-                        title: 'Unknown error',
-                        message: 'Please try again',
-                        errors: {},
-                    },
-                });
-            }
-        }).catch((error) => {
-            console.log(error);
-        });
+        this.props.actionUploadImage(formData);
     }
 
     handleSubmitAddressChange = () => {
-        const values = this.props.address_change_form.values.address_form;
-
-        const submitAddressChangeForm = new Promise((resolve) => {
-            resolve(this.props.actionChangeAddress(values));
-        });
-        submitAddressChangeForm.then((result) => {
-            if (result.payload.data.status === 'ok') {
-                this.setState({
-                    getProfileResponse: result.payload.data.profile,
-                    isActiveChangeAddressForm: false,
-                    notification: {
-                        status: 'ok_and_dismiss',
-                        title: 'Success.',
-                        message: 'Your changes were processed.',
-                        errors: {},
-                    },
-                });
-            } else {
-                this.setState({
-                    notification: {
-                        status: 'error',
-                        title: 'Error',
-                        message: 'Please correct errors below.',
-                        errors: result.payload.data.errors,
-                    },
-                });
-            }
-        }).catch((error) => {
-            console.log(error);
-        });
+        const values = this.props.addressChangeForm.values.address_form;
+        this.props.actionChangeAddress(values);
     }
 
     toggleAddressChangeForm = () => {
@@ -238,13 +224,13 @@ class Account extends React.Component {
     render() {
         console.log('account state', this.state);
         console.log('canvas ref', this.imagePreviewCanvasRef.current);
-
+        const { isOnline, dataOfflineUser, errorUpload } = this.props;
         return (
             <React.Fragment>
                 <main id="account">
                     <h1> Hello World from Account! </h1>
                     {
-                        this.props.online_status.isOnline ? (
+                        isOnline ? (
                             <div className="flex">
                                 <Button component={Link} to="/account/contacts">
                                     Manage contact
@@ -257,22 +243,22 @@ class Account extends React.Component {
                             null
                     }
                     <Profile
-                        profile={this.state.getProfileResponse}
+                        profile={dataOfflineUser.profile}
                         handleSubmitAddressChange={this.handleSubmitAddressChange}
                         toggleAddressChangeForm={this.toggleAddressChangeForm}
                         notification={this.state.notification}
                         handleNotificationDismiss={this.handleNotificationDismiss}
                         isActiveChangeAddressForm={this.state.isActiveChangeAddressForm}
-                        onlineStatus={this.props.online_status}
+                        onlineStatus={isOnline}
                     />
                     {
-                        this.props.online_status.isOnline ? (
+                        isOnline ? (
                             <React.Fragment>
                                 <ImageUploadForm
                                     handleFileSelected={this.handleFileSelected}
                                     handleDeleteFileSelected={this.handleDeleteFileSelected}
                                     handleImageUploadFormSubmit={this.handleImageUploadFormSubmit}
-                                    uploadErrors={this.state.uploadErrors}
+                                    uploadErrors={errorUpload}
                                 />
                             </React.Fragment>
                         ) :
@@ -286,23 +272,26 @@ class Account extends React.Component {
 }
 
 Account.propTypes = {
-    checkSession: PropTypes.object.isRequired,
-    user_data_for_offline: PropTypes.object.isRequired,
+    dataSession: PropTypes.any,
+    dataOfflineUser: PropTypes.any,
     actionUploadImage: PropTypes.func.isRequired,
     actionChangeAddress: PropTypes.func.isRequired,
-    address_change_form: PropTypes.any,
-    online_status: PropTypes.object.isRequired,
+    addressChangeForm: PropTypes.any,
+    isOnline: PropTypes.bool.isRequired,
+    dataUpload: PropTypes.any,
+    dataAddress: PropTypes.any,
+    errorUpload: PropTypes.any,
+    errorAddress: PropTypes.any,
 };
 
 
 const mapStateToProps = (state) => {
     return {
-        address_change_form: state.form.AddressChangeForm,
-        user_data_for_offline: state.getUserDataForOffline,
-        changeAddress: state.changeAddress,
-        login: state.login,
-        online_status: state.online_status,
-        checkSession: state.checkSession,
+        ...state.account,
+        addressChangeForm: state.form.AddressChangeForm,
+        dataOfflineUser: state.status.dataOfflineUser,
+        isOnline: state.status.isOnline,
+        dataSession: state.status.dataSession,
     };
 };
 

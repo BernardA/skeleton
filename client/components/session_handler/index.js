@@ -90,7 +90,8 @@ class SessionHandler extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.location.pathname !== this.props.location.pathname) {
+        const { location, isLogged } = this.props;
+        if (prevProps.location.pathname !== location.pathname) {
             const { allCookies } = this.props;
             if (allCookies.session) {
                 localforage.getItem('last_active').then((value) => {
@@ -108,6 +109,9 @@ class SessionHandler extends React.Component {
                     }
                 });
             }
+        }
+        if (prevProps.isLogged !== isLogged && !isLogged) {
+            this.onLogout();
         }
     }
 
@@ -175,7 +179,7 @@ class SessionHandler extends React.Component {
                 // this is attempt to check server session and logout if none exists
                 // after one hour server inactivity
                 if (value.server + 3600 < Now()) {
-                    this.checkIsLoggedOnServer();
+                    this.props.actionCheckSession();
                 }
             } else { // if, for any reason, last_active is not stored, set it
                 localforage.setItem('last_active', { server: Now(), client: Now() });
@@ -203,35 +207,8 @@ class SessionHandler extends React.Component {
     };
 
     makeRealRequestToRefreshServerSession = () => {
-        const newPromise = new Promise((resolve) => {
-            resolve(this.props.actionGetInitialDataForOffline());
-        });
-        newPromise
-            .then((result) => {
-                const data = result.payload.data;
-                // set indexeddb
-                localforage.setItem('timestamp-initialdata', new Date());
-                localforage.setItem('pages', data.pages);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+        this.props.actionGetInitialDataForOffline();
     };
-
-    checkIsLoggedOnServer = () => {
-        const check = new Promise((resolve) => {
-            resolve(this.props.actionCheckSession());
-        });
-        check.then((response) => {
-            console.log('response', response);
-            const data = response.payload.data;
-            if (!data.is_logged) {
-                this.onLogout();
-            }
-        }).catch((error) => {
-            console.log('error', error);
-        });
-    }
 
     render() {
         if (this.state.action === 'logout') {
@@ -260,11 +237,12 @@ SessionHandler.propTypes = {
     location: PropTypes.object.isRequired,
     actionGetInitialDataForOffline: PropTypes.func.isRequired,
     actionCheckSession: PropTypes.func.isRequired,
+    isLogged: PropTypes.any,
 };
 
 const mapStateToProps = (state) => {
     return {
-        check_session: state.check_session,
+        ...state.status.dataSession,
     };
 };
 

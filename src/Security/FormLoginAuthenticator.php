@@ -121,9 +121,9 @@ class FormLoginAuthenticator extends AbstractGuardAuthenticator
         $session_info = [
             "username" => $token->getUser()->getUsername(),
             "email" => $token->getUser()->getEmail(),
-            "session_id" => $session->getId(),
-            'is_admin' => $is_admin, 
-            'is_logged' => true   
+            "sessionId" => $session->getId(),
+            'isAdmin' => $is_admin, 
+            'isLogged' => true   
         ];
 
         //checks if there's an ad awaiting user to be registered
@@ -147,12 +147,10 @@ class FormLoginAuthenticator extends AbstractGuardAuthenticator
         $this->deleteFailedLoginsOnSuccess($token->getUser()->getEmail());
         return new JsonResponse(
             array(
-            	'status' => 'ok',
-            	'message' => $this->message,
                 'referer' => $this->referer,
-                'session_info' => $session_info,
+                'sessionInfo' => $session_info,
                 //'pending_ad' => $pending_ad,
-                'user_id' => $token->getUser()->getId(),
+                'userId' => $token->getUser()->getId(),
                 //'profile' => $profile,
             	)
         );
@@ -185,11 +183,10 @@ class FormLoginAuthenticator extends AbstractGuardAuthenticator
 
         return new JsonResponse(
             array(
-            	'status' => 'error',
             	'reason' => $this->failure, 
             	'message' => $this->message,
             	'referer' => $this->referer,
-            	)
+            ), Response::HTTP_UNAUTHORIZED
         );
 	}
 

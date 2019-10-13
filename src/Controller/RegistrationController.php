@@ -103,9 +103,8 @@ class RegistrationController extends Controller
         ));
         */
         return $this->json(array(
-            'status' => 'error',
             'errors' => 'not submitted',
-        )); 
+        ), Response::HTTP_BAD_REQUEST); 
     }
 
     /**

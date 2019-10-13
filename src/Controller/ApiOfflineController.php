@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use App\Security\FormLoginAuthenticator;
+use Symfony\Component\HttpFoundation\Response;
 
 class ApiOfflineController extends Controller
 {
@@ -38,14 +39,13 @@ class ApiOfflineController extends Controller
                 return $this->json(array(
                     'status' => 'error',
                     'error' => 'Invalid Token'
-                ));
+                ), Response::HTTP_UNAUTHORIZED);
             }
         }
 
         $this->initialize();
         return $this->json(array(
-            'status' => 'ok',
-            'is_logged' => $this->isLogged,
+            'isLogged' => $this->isLogged,
         ));
     }
 
@@ -54,9 +54,8 @@ class ApiOfflineController extends Controller
         $this->initialize();
         if (!$this->isLogged) {
             return $this->json(array(
-                'status' => 'error',
                 'error' => "Accès interdit",
-            ));
+            ), Response::HTTP_UNAUTHORIZED);
         }
         $data = $request->getContent();
         $this->data = json_decode($data);
@@ -65,15 +64,13 @@ class ApiOfflineController extends Controller
         if ($this->data->username === $username) {
             $profile = $this->formLoginAuthenticator->getProfile($this->user);
             return $this->json(array(
-                'status' => 'ok',
                 'profile' => $profile,
             ));
         } else {
             return $this->json(array(
-                'status' => 'error',
                 'type' => 'unknown',
                 'errors' => 'Accès interdit',
-            ));
+            ), Response::HTTP_UNAUTHORIZED);
         }
     }
 }

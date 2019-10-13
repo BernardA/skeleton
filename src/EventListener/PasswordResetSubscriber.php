@@ -43,7 +43,6 @@ class PasswordResetSubscriber implements EventSubscriberInterface
             $message = "An email has been sent.";
 
             $response  = new JsonResponse(array(
-                'status' => 'error',
                 'message' => $message,
             ));  
             $event->setResponse($response); 
@@ -56,7 +55,6 @@ class PasswordResetSubscriber implements EventSubscriberInterface
         If you don't get an email check your spam folder or try again.";
 
         $response  = new JsonResponse(array(
-            'status' => 'ok',
             'message' => $message,
         ));  
         $event->setResponse($response);   
@@ -68,7 +66,6 @@ class PasswordResetSubscriber implements EventSubscriberInterface
         if ($event->getRequest()->isMethod('GET')) {
                 $message = "";
                 $response  = new JsonResponse(array(
-                    'status' => 'ok',
                     'message' => $message,
                 )); 
             $event->setResponse($response);
@@ -82,9 +79,8 @@ class PasswordResetSubscriber implements EventSubscriberInterface
             $message = "Token expired or invalid.";
 
             $response  = new JsonResponse(array(
-                'status' => 'error',
                 'message' => $message,
-            ));  
+            ), Response::HTTP_UNAUTHORIZED);  
             $event->setResponse($response);
         } 
     }
@@ -94,7 +90,6 @@ class PasswordResetSubscriber implements EventSubscriberInterface
         $message = "Password succesfully reset.";
 
         $response  = new JsonResponse(array(
-            'status' => 'ok',
             'message' => $message,
         ));  
         $event->setResponse($response);

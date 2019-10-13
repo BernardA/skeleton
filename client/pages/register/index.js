@@ -28,7 +28,6 @@ class Register extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isLoading: false,
             isPasswordMasked: true,
             notification: {
                 status: '',
@@ -39,84 +38,44 @@ class Register extends React.Component {
         };
     }
 
-    onSubmitRegister = () => {
-        this.setState({
-            isLoading: true,
-        });
-        const values = this.props.register_form.values;
-
-        const submitAddressForm = new Promise((resolve) => {
-            resolve(this.props.actionInsertAddress(values));
-        });
-        console.log('register form values', values);
-        submitAddressForm.then((result) => {
-            console.log('result address form', result.payload.data);
-            if (result.payload.data.status === 'error') {
-                this.setState({
-                    isLoading: false,
-                    notification: {
-                        status: 'error',
-                        title: 'There was an error.',
-                        message: 'Please review the following:',
-                        errors: result.payload.data.errors,
-                    },
-                });
-                return;
-            }
-            // eslint-disable-next-line max-len
-            this.props.register_form.values.fos_user_registration_form.address_id = result.payload.data.address_id;
-            // eslint-disable-next-line consistent-return
-            return this.props.register_form.values;
-        }).then((result) => {
-            const submitForm = new Promise((resolve) => {
-                resolve(this.props.actionRegister(result));
-            });
-            submitForm.then((result1) => {
-                const data = result1.payload.data;
-                if (data.status === 'error') {
-                    let title = 'There was an error.';
-                    let message = 'Please review the following:';
-                    let errors = data.errors;
-                    if (data.errors === 'not submitted') {
-                        title = 'Unknown error.';
-                        message = 'Please try again';
-                        errors = {};
-                    }
-                    this.setState({
-                        isLoading: false,
-                        notification: {
-                            status: 'error',
-                            title,
-                            message,
-                            errors,
-                        },
-                    });
-                    return;
-                }
-                const message = `A confirmation e-mail was sent to 
-                    ${data.email}. 
-                    Please check your mailbox and click on the link on that e-mail.`;
-                this.setState({
-                    isLoading: false,
-                    notification: {
-                        status: 'ok_and_dismiss',
-                        title: 'You are now registered.',
-                        message,
-                        errors: {},
-                    },
-                });
-            });
-        }).catch(() => {
+    componentDidUpdate(prevProps) {
+        const {
+            addressId,
+            registerForm,
+            errorReq,
+            dataRegister,
+        } = this.props;
+        if (!prevProps.errorReq && errorReq) {
             this.setState({
-                isLoading: false,
                 notification: {
                     status: 'error',
-                    title: 'Unknown error',
-                    message: 'Please try again',
+                    title: 'There was an error.',
+                    message: 'Please review the following:',
+                    errors: errorReq,
+                },
+            });
+        }
+        if (!prevProps.addressId && addressId) {
+            registerForm.values.fos_user_registration_form.address_id = addressId;
+            this.props.actionRegister(registerForm.values);
+        }
+        if (!prevProps.dataRegister && dataRegister) {
+            const message = `A confirmation e-mail was sent to ${dataRegister.email}. 
+            Please check your mailbox and click on the link on that e-mail.`;
+            this.setState({
+                notification: {
+                    status: 'ok_and_dismiss',
+                    title: 'You are now registered.',
+                    message,
                     errors: {},
                 },
             });
-        });
+        }
+    }
+
+    onSubmitRegister = () => {
+        const values = this.props.registerForm.values;
+        this.props.actionInsertAddress(values);
     }
 
     handleToggleVisiblePassword = () => {
@@ -141,16 +100,12 @@ class Register extends React.Component {
     }
 
     render() {
-        const { classes } = this.props;
-        if (this.props.online_status.isOnline) {
+        const { classes, isLoading, isOnline } = this.props;
+        if (isOnline) {
             return (
                 <React.Fragment>
                     <main>
-                        {this.state.isLoading ?
-                            <Loading />
-                            :
-                            null
-                        }
+                        {isLoading ? <Loading /> : null}
                         <Card className={classes.root}>
                             <CardHeader
                                 className={classes.header}
@@ -195,21 +150,23 @@ class Register extends React.Component {
 }
 
 Register.propTypes = {
-    register_form: PropTypes.any,
+    registerForm: PropTypes.any,
     actionInsertAddress: PropTypes.func.isRequired,
     actionRegister: PropTypes.func.isRequired,
     history: PropTypes.object.isRequired,
     classes: PropTypes.object.isRequired,
-    online_status: PropTypes.object.isRequired,
+    isOnline: PropTypes.bool.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+    errorReq: PropTypes.any,
+    addressId: PropTypes.any,
+    dataRegister: PropTypes.any,
 };
 
 const mapStateToProps = (state) => {
     return {
-        socialRegisterGoogle: state.socialRegisterGoogle,
-        register_form: state.form.RegisterForm,
-        register: state.register,
-        insertAddress: state.insertAddress,
-        online_status: state.online_status,
+        ...state.register,
+        registerForm: state.form.RegisterForm,
+        isOnline: state.status.isOnline,
     };
 };
 

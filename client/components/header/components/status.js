@@ -37,6 +37,7 @@ class Status extends React.Component {
     }
 
     render() {
+        const { isOnline } = this.props;
         const linkAuth = () => {
             if (this.state.username != null) {
                 return (
@@ -46,7 +47,7 @@ class Status extends React.Component {
                             <span className="status_user">{this.state.username}</span>
                         </ButtonBase>
                         {
-                            this.props.online_status.isOnline ? (
+                            isOnline ? (
                                 <ButtonBase
                                     component={Link}
                                     to="/logout"
@@ -87,7 +88,7 @@ class Status extends React.Component {
 
 Status.propTypes = {
     allCookies: PropTypes.object.isRequired,
-    online_status: PropTypes.object.isRequired,
+    isOnline: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -95,7 +96,7 @@ const mapStateToProps = (state) => {
         login: state.login,
         checkSession: state.checkSession,
         socialLoginGoogle: state.socialLoginGoogle,
-        online_status: state.online_status,
+        isOnline: state.status.isOnline,
         insertSocialRegisterSupp: state.insertSocialRegisterSupp,
     };
 };

@@ -121,7 +121,6 @@ const mapStateToProps = (state) => {
     return {
         category_insert_form: state.form.CategoryInsertForm,
         category_delete_form: state.form.CategoryDeleteForm,
-        getInitialDataForOffline: state.getInitialDataForOffline,
     };
 };
 

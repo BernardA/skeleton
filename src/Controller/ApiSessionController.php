@@ -39,10 +39,9 @@ class ApiSessionController extends Controller
         $data = $request->getContent();
         $data = json_decode($data, true);
         return $this->json(array(
-            'status' => 'ok', 
-            'last_active' => $session->get('last_active'),
-            'is_logged' => $is_logged,
-            'is_admin' => $is_admin,
+            'lastActive' => $session->get('last_active'),
+            'isLogged' => $is_logged,
+            'isAdmin' => $is_admin,
             'username' => $username,
         ));
     }

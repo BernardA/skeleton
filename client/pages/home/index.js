@@ -65,7 +65,7 @@ Home.propTypes = {
 
 const mapStateToProps = (state) => {
     return {
-        online_status: state.online_status,
+        isOnline: state.status.isOnline,
     };
 };
 

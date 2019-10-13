@@ -24,7 +24,6 @@ class PasswordResetRequest extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isLoading: false,
             notification: {
                 status: '',
                 title: '',
@@ -34,35 +33,23 @@ class PasswordResetRequest extends React.Component {
         };
     }
 
-    onSubmitPasswordResetRequest = () => {
-        this.setState({ isLoading: true });
-        const submitForm = new Promise((resolve) => {
-            resolve(this.props.actionRequestPasswordChange(
-                this.props.password_reset_request_form.values,
-            ));
-        });
-        submitForm.then((result) => {
-            const message = result.payload.data.message;
+    componentDidUpdate(prevProps) {
+        const { dataRequestPassword } = this.props;
+        if (!prevProps.dataRequestPassword && dataRequestPassword) {
             this.setState({
-                isLoading: false,
                 notification: {
                     status: 'ok_and_dismiss',
                     title: 'Email sent.',
-                    message,
+                    message: dataRequestPassword.message,
                     errors: {},
                 },
             });
-        }).catch(() => {
-            this.setState({
-                isLoading: false,
-                notification: {
-                    status: 'error',
-                    title: 'Unknown error',
-                    message: 'Please try again',
-                    errors: {},
-                },
-            });
-        });
+        }
+    }
+
+    onSubmitPasswordResetRequest = () => {
+        const values = this.props.password_reset_request_form.values;
+        this.props.actionRequestPasswordChange(values);
     }
 
     handleNotificationDismiss = () => {
@@ -81,16 +68,12 @@ class PasswordResetRequest extends React.Component {
     }
 
     render() {
-        const { classes } = this.props;
-        if (this.props.online_status.isOnline) {
+        const { classes, isLoading, isOnline } = this.props;
+        if (isOnline) {
             return (
                 <React.Fragment>
                     <main>
-                        {this.state.isLoading ?
-                            <Loading />
-                            :
-                            null
-                        }
+                        {isLoading ? <Loading /> : null}
                         <Card className={classes.root}>
                             <CardHeader
                                 className={classes.header}
@@ -130,18 +113,20 @@ class PasswordResetRequest extends React.Component {
 }
 
 PasswordResetRequest.propTypes = {
+    isLoading: PropTypes.bool.isRequired,
     actionRequestPasswordChange: PropTypes.func.isRequired,
     password_reset_request_form: PropTypes.any,
     history: PropTypes.object.isRequired,
-    online_status: PropTypes.object.isRequired,
+    isOnline: PropTypes.bool.isRequired,
     classes: PropTypes.object.isRequired,
+    dataRequestPassword: PropTypes.any,
 };
 
 const mapStateToProps = (state) => {
     return {
         password_reset_request_form: state.form.PasswordResetRequestForm,
-        requestPasswordChange: state.requestPasswordChange,
-        online_status: state.online_status,
+        dataRequestPassword: state.auth.dataRequestPassword,
+        isOnline: state.status.isOnline,
     };
 };
 

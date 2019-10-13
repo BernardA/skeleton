@@ -36,7 +36,7 @@ class Header extends React.Component {
         // this.getGeo(); //DISABLED TO AVOID CHARGES/KEEP PARIS AS DEFAULT
 
         // check if is online and initial data exists in indexeddb, if not fetch it
-        if (this.props.online_status.isOnline) {
+        if (this.props.isOnline) {
             localforage.getItem('ads').then((value) => {
                 if (value === null) {
                     this.getInitialDataForOffline();
@@ -84,49 +84,12 @@ class Header extends React.Component {
     }
 
     getInitialDataForOffline = () => {
-        // get all initial data for offline from remote
-        const getData = new Promise((resolve) => {
-            resolve(this.props.actionGetInitialDataForOffline());
-        });
-        getData.then((result) => {
-            const data = result.payload.data;
-            // set indexeddb
-            localforage.setItem('ads', data.ads);
-            localforage.setItem('categories', data.categories);
-            localforage.setItem('places', data.places);
-            localforage.setItem('timestamp-initialdata', new Date());
-        }).catch((error) => {
-            console.log(error);
-        });
+        this.props.actionGetInitialDataForOffline();
     }
 
     getUserDataForOffline = (username) => {
-        const getUserData = new Promise((resolve) => {
-            resolve(this.props.actionGetUserDataForOffline(username));
-        });
-
-        getUserData.then((result) => {
-            if (result.error) {
-                window.addEventListener('isOnline', this.getUserDataForOffline);
-                // check if offline event already fired
-                localforage.getItem('offline-event-fired').then((data) => {
-                    if (data === null) {
-                        window.dispatchEvent(new Event('offline'));
-                        localforage.setItem('offline-event-fired', true);
-                    }
-                });
-            } else {
-                localforage.setItem('inbox', result.payload.data.inbox);
-                localforage.setItem('sentbox', result.payload.data.sentbox);
-                localforage.setItem('contacts', result.payload.data.contacts);
-                localforage.setItem('profile', result.payload.data.profile);
-                localforage.setItem('timestamp-userdata', new Date());
-            }
-        }).catch((error) => {
-            console.log(error);
-        });
+        this.props.actionGetUserDataForOffline(username);
     }
-
 
     handleNotificationDismiss = () => {
         this.setState({
@@ -141,7 +104,6 @@ class Header extends React.Component {
 
     render() {
         const { location } = this.props;
-
         return (
             <React.Fragment>
                 {
@@ -181,18 +143,20 @@ class Header extends React.Component {
 
 Header.propTypes = {
     location: PropTypes.object.isRequired,
-    online_status: PropTypes.object.isRequired,
+    isOnline: PropTypes.bool.isRequired,
     actionGetInitialDataForOffline: PropTypes.func.isRequired,
     actionGetUserDataForOffline: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {
     return {
+        errorOfflineUser: state.status,
+        dataOfflineUser: state.status,
+        errorOfflineInitial: state.status,
+        dataOfflineInitial: state.status,
         showMap: state.showMap,
         getGeoInfo: state.getGeoInfo,
-        online_status: state.online_status,
-        getInitialDataForOffline: state.getInitialDataForOffline,
-        getUserDataForOffline: state.getUserDataForOffline,
+        isOnline: state.status.isOnline,
     };
 };
 

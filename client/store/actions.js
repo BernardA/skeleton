@@ -1,159 +1,131 @@
-import axios from 'axios';
+export const ONLINE_STATUS = 'ONLINE_STATUS';
 
 export const CHECK_SESSION = 'CHECK_SESSION';
+export const CHECK_SESSION_INIT = 'CHECK_SESSION_INIT';
+export const CHECK_SESSION_OK = 'CHECK_SESSION_OK';
+export const CHECK_SESSION_ERROR = 'CHECK_SESSION_ERROR';
 
 export function actionCheckSession() {
-    const url = '/api-session';
     return {
         type: CHECK_SESSION,
-        payload: axios.get(url),
     };
 }
 
 export const GET_USER_DATA_FOR_OFFLINE = 'GET_USER_DATA_FOR_OFFLINE';
+export const GET_USER_DATA_FOR_OFFLINE_INIT = 'GET_USER_DATA_FOR_OFFLINE_INIT';
+export const GET_USER_DATA_FOR_OFFLINE_OK = 'GET_USER_DATA_FOR_OFFLINE_OK';
+export const GET_USER_DATA_FOR_OFFLINE_ERROR = 'GET_USER_DATA_FOR_OFFLINE_ERROR';
+
 export const GET_INITIAL_DATA_FOR_OFFLINE = 'GET_INITIAL_DATA_FOR_OFFLINE';
+export const GET_INITIAL_DATA_FOR_OFFLINE_INIT = 'GET_INITIAL_DATA_FOR_OFFLINE_INIT';
+export const GET_INITIAL_DATA_FOR_OFFLINE_OK = 'GET_INITIAL_DATA_FOR_OFFLINE_OK';
+export const GET_INITIAL_DATA_FOR_OFFLINE_ERROR = 'GET_INITIAL_DATA_FOR_OFFLINE_ERROR';
 
-export function actionGetUserDataForOffline(params) {
-    const url = '/api-offline/get-offline-user';
-
+export function actionGetUserDataForOffline(values) {
     return {
         type: GET_USER_DATA_FOR_OFFLINE,
-        payload: axios.post(url, params),
+        values,
     };
 }
 
 export function actionGetInitialDataForOffline() {
-    const url = '/api-offline/get-offline-initial';
-
-    const data = {
-        payload: 'getInitialDataForOffline', // same as initial data
-    };
-
     return {
         type: GET_INITIAL_DATA_FOR_OFFLINE,
-        payload: axios.post(url, data),
     };
 }
 
 export const LOGIN = 'LOGIN';
+export const LOGIN_INIT = 'LOGIN_INIT';
+export const LOGIN_OK = 'LOGIN_OK';
+export const LOGIN_ERROR = 'LOGIN_ERROR';
 
 export function actionLogin(values) {
-    const url = '/login_check';
-
-    const data = {
-        _email: values._username,
-        _password: values._password,
-        _remember_me: values._remember_me,
-    };
-
     return {
         type: LOGIN,
-        payload: axios.post(url, data),
+        values,
     };
 }
 
 export const REGISTER = 'REGISTER';
+export const REGISTER_INIT = 'REGISTER_INIT';
+export const REGISTER_OK = 'REGISTER_OK';
+export const REGISTER_ERROR = 'REGISTER_ERROR';
 export const INSERT_ADDRESS = 'INSERT_ADDRESS';
+export const INSERT_ADDRESS_INIT = 'INSERT_ADDRESS_INIT';
+export const INSERT_ADDRESS_OK = 'INSERT_ADDRESS_OK';
+export const INSERT_ADDRESS_ERROR = 'INSERT_ADDRESS_ERROR';
 
 export function actionRegister(values) {
-    const url = '/register/';
-    const data = new URLSearchParams();
-    data.append('fos_user_registration_form[email]', values.fos_user_registration_form.email);
-    data.append('fos_user_registration_form[plainPassword][first]', values.fos_user_registration_form.plainPassword.first);
-    data.append('fos_user_registration_form[plainPassword][second]', values.fos_user_registration_form.plainPassword.second);
-    data.append('fos_user_registration_form[username]', values.fos_user_registration_form.username);
-    data.append('fos_user_registration_form[address]', values.fos_user_registration_form.address_id);
-    data.append('fos_user_registration_form[rgpd]', values.fos_user_registration_form.rgpd);
-    data.append('fos_user_registration_form[failedLogins]', 0); // TODO this should be set automatically server side
-
     return {
         type: REGISTER,
-        payload: axios.post(url, data),
+        values,
     };
 }
 
 export function actionInsertAddress(values) {
-    const url = '/api-address/insert';
-
-    const data = new URLSearchParams();
-    data.append('address_form[address1]', values.address1);
-    data.append('address_form[address2]', values.address2);
-    if (values.address3) {
-        data.append('address_form[address3]', values.address3);
-    }
-    data.append('address_form[city]', values.city);
-    data.append('address_form[postalCode]', values.postal_code);
-    // data.append('address_form[lat]', null);
-    // data.append('address_form[lng]', null);
-
     return {
         type: INSERT_ADDRESS,
-        payload: axios.post(url, data),
+        values,
     };
 }
 
 export const UPLOAD_IMAGE = 'UPLOAD_IMAGE';
+export const UPLOAD_IMAGE_INIT = 'UPLOAD_IMAGE_INIT';
+export const UPLOAD_IMAGE_OK = 'UPLOAD_IMAGE_OK';
+export const UPLOAD_IMAGE_ERROR = 'UPLOAD_IMAGE_ERROR';
+
 export const CHANGE_ADDRESS = 'CHANGE_ADDRESS';
+export const CHANGE_ADDRESS_INIT = 'CHANGE_ADDRESS_INIT';
+export const CHANGE_ADDRESS_OK = 'CHANGE_ADDRESS_OK';
+export const CHANGE_ADDRESS_ERROR = 'CHANGE_ADDRESS_ERROR';
 
-export function actionUploadImage(formValues) {
-    const url = '/api-userxtra/image-upload';
-
+export function actionUploadImage(values) {
     return {
         type: UPLOAD_IMAGE,
-        payload: axios.post(url, formValues),
+        values,
     };
 }
 
 export function actionChangeAddress(values) {
-    const url = '/api-address/change';
-    const data = new URLSearchParams();
-    data.append('address_form[address1]', values.address1);
-    data.append('address_form[address2]', values.address2);
-    if (values.address3) {
-        data.append('address_form[address3]', values.address3);
-    }
-    data.append('address_form[city]', values.city);
-    data.append('address_form[postalCode]', values.postalCode);
-    data.append('address_form[lat]', values.lat);
-    data.append('address_form[lng]', values.lng);
     return {
         type: CHANGE_ADDRESS,
-        payload: axios.post(url, data),
+        values,
     };
 }
 
 export const SUBMIT_PASSWORD_RESET_TOKEN = 'SUBMIT_PASSWORD_RESET_TOKEN';
+export const SUBMIT_PASSWORD_RESET_TOKEN_INIT = 'SUBMIT_PASSWORD_RESET_TOKEN_INIT';
+export const SUBMIT_PASSWORD_RESET_TOKEN_OK = 'SUBMIT_PASSWORD_RESET_TOKEN_OK';
+export const SUBMIT_PASSWORD_RESET_TOKEN_ERROR = 'SUBMIT_PASSWORD_RESET_TOKEN_ERROR';
+
 export const CHANGE_PASSWORD = 'CHANGE_PASSWORD';
+export const CHANGE_PASSWORD_INIT = 'CHANGE_PASSWORD_INIT';
+export const CHANGE_PASSWORD_OK = 'CHANGE_PASSWORD_OK';
+export const CHANGE_PASSWORD_ERROR = 'CHANGE_PASSWORD_ERROR';
 
 export function actionSubmitPasswordResetToken(token) {
-    const url = `/api-resetting/check-token/${token}`;
     return {
         type: SUBMIT_PASSWORD_RESET_TOKEN,
-        payload: axios.get(url),
+        token,
     };
 }
 
 export function actionChangePassword(values, token) {
-    const url = `/api-resetting/reset/${token}`;
-    const data = new URLSearchParams();
-    data.append('fos_user_resetting_form[plainPassword][first]', values.fos_user_resetting_form.plainPassword.first);
-    data.append('fos_user_resetting_form[plainPassword][second]', values.fos_user_resetting_form.plainPassword.second);
-
     return {
         type: CHANGE_PASSWORD,
-        payload: axios.post(url, data),
+        values,
+        token,
     };
 }
 
 export const REQUEST_PASSWORD_CHANGE = 'REQUEST_PASSWORD_CHANGE';
+export const REQUEST_PASSWORD_CHANGE_INIT = 'REQUEST_PASSWORD_CHANGE_INIT';
+export const REQUEST_PASSWORD_CHANGE_OK = 'REQUEST_PASSWORD_CHANGE_OK';
+export const REQUEST_PASSWORD_CHANGE_ERROR = 'REQUEST_PASSWORD_CHANGE_ERROR';
 
 export function actionRequestPasswordChange(values) {
-    const url = '/resetting/send-email';
-    const data = new URLSearchParams();
-    data.append('username', values.username);
-
     return {
         type: REQUEST_PASSWORD_CHANGE,
-        payload: axios.post(url, data),
+        values,
     };
 }
