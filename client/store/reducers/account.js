@@ -15,7 +15,6 @@ const initialState = {
 };
 
 export default (state = initialState, action) => {
-    console.log('register reducer', action);
     switch (action.type) {
     case UPLOAD_IMAGE_INIT:
         return {

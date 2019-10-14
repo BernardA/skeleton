@@ -81,7 +81,15 @@ const api = (
 
 function errorParser(error) {
     console.log('error parser', error);
-    return false;
+    const parsedE = [];
+    Object.keys(error).forEach((e) => {
+        console.log('error', e);
+        const obj = {};
+        obj[e] = error[e];
+        parsedE.push(obj);
+    });
+    console.log('parsedE', parsedE);
+    return error;
 }
 
 function isOffline(error) {
@@ -112,7 +120,7 @@ function* checkSession(action) {
         console.log('check session response data', data);
     } catch (error) {
         const isOff = isOffline(error);
-        const data = isOff ? null : errorParser(error.response);
+        const data = isOff ? null : errorParser(error.response.data);
         console.log('check session error', error.response);
         if (isOff) {
             yield put({
@@ -145,7 +153,7 @@ function* getInitialDataForOffline(action) {
         localforage.setItem('timestamp-initialdata', new Date());
     } catch (error) {
         const isOff = isOffline(error);
-        const data = isOff ? null : errorParser(error.response);
+        const data = isOff ? null : errorParser(error.response.data);
         console.log('initial off response error', error.response);
         if (isOff) {
             yield put({
@@ -179,16 +187,14 @@ function* getUserDataForOffline(action) {
         localforage.setItem('timestamp-userdata', new Date());
     } catch (error) {
         const isOff = isOffline(error);
-        const data = isOff ? null : errorParser(error.response);
+        const data = isOff ? null : errorParser(error.response.data);
         console.log('user offline response error', error.response);
         if (isOff) {
+            window.addEventListener('isOnline', this.getUserDataForOffline);
             yield put({
                 type: ONLINE_STATUS,
                 isOnline: false,
             });
-        }
-        if (isOffline()) {
-            window.addEventListener('isOnline', this.getUserDataForOffline);
         }
         yield put({
             type: GET_USER_DATA_FOR_OFFLINE_ERROR,
@@ -220,8 +226,8 @@ function* login(action) {
         localforage.setItem('last_active', { server: Now(), client: Now() });
     } catch (error) {
         const isOff = isOffline(error);
-        const data = isOff ? null : errorParser(error.response);
-        console.log('login response error', error.response);
+        const data = isOff ? null : error.response.data;
+        console.log('login response error', error.response.data);
         if (isOff) {
             yield put({
                 type: ONLINE_STATUS,
@@ -263,7 +269,7 @@ function* register(action) {
         // axios.defaults.headers.common = { Authorization: `Bearer ${data.token}` };
     } catch (error) {
         const isOff = isOffline(error);
-        const data = isOff ? null : errorParser(error.response);
+        const data = isOff ? null : error.response.data[0];
         console.log('response response error', error.response);
         if (isOff) {
             yield put({
@@ -305,7 +311,7 @@ function* insertAddress(action) {
         console.log('insert address response data', data);
     } catch (error) {
         const isOff = isOffline(error);
-        const data = isOff ? null : errorParser(error.response);
+        const data = isOff ? null : error.response.data;
         console.log('insert address response error', error.response);
         if (isOff) {
             yield put({
@@ -337,7 +343,7 @@ function* uploadImage(action) {
         console.log('upload image response data', data);
     } catch (error) {
         const isOff = isOffline(error);
-        const data = isOff ? null : errorParser(error.response);
+        const data = isOff ? null : error.response.data;
         console.log('upload response error', error.response);
         if (isOff) {
             yield put({
@@ -379,7 +385,7 @@ function* changeAddress(action) {
         console.log('change address response data', data);
     } catch (error) {
         const isOff = isOffline(error);
-        const data = isOff ? null : errorParser(error.response);
+        const data = isOff ? null : error.response.data[0];
         console.log('change address response error', error.response);
         if (isOff) {
             yield put({
@@ -410,7 +416,7 @@ function* submitPasswordResetToken(action) {
         console.log('submit password token response data', data);
     } catch (error) {
         const isOff = isOffline(error);
-        const data = isOff ? null : errorParser(error.response);
+        const data = isOff ? null : error.response.data;
         console.log('submit password token response error', error.response);
         if (isOff) {
             yield put({
@@ -445,8 +451,8 @@ function* changePassword(action) {
         console.log('change password response data', data);
     } catch (error) {
         const isOff = isOffline(error);
-        const data = isOff ? null : errorParser(error.response);
-        console.log('change password response error', error.response);
+        const data = isOff ? null : error.response.data[0];
+        console.log('change password response error', error.response.data);
         if (isOff) {
             yield put({
                 type: ONLINE_STATUS,
@@ -479,7 +485,7 @@ function* requestPasswordChange(action) {
         console.log('request password response data', data);
     } catch (error) {
         const isOff = isOffline(error);
-        const data = isOff ? null : errorParser(error.response);
+        const data = isOff ? null : error.response.data;
         console.log('reques password response error', error.response);
         if (isOff) {
             yield put({

@@ -1,41 +1,34 @@
+
 export default () => {
     return ({
         root: {
+            textAlign: 'center',
+            maxWidth: '300px',
             margin: '0 auto',
-            maxWidth: '550px',
-            minHeight: '500px',
         },
         header: {
-            maxWidth: '350px',
-            margin: '40px auto',
-            textAlign: 'center',
+            margin: '20px auto',
         },
         title: {
             textTransform: 'uppercase',
         },
         content: {
-            maxWidth: '350px',
-            margin: '40px auto',
+            margin: '20px auto',
             padding: 0,
-        },
-        notMember: {
-            margin: '20px 0',
-            textAlign: 'center',
-        },
-        container: {
-            display: 'flex',
-            flexWrap: 'wrap',
+            '& > div:first-of-type': {
+                margin: '20px 0',
+            },
         },
         button: {
             margin: '20px 0',
+        },
+        lineWrapSpan: {
+            display: 'block',
         },
         formGroup: {
             marginRight: 0,
             justifyContent: 'space-between',
             lineHeight: '45px',
-        },
-        lineWrapSpan: {
-            display: 'block',
         },
     });
 };

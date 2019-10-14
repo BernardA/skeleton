@@ -36,7 +36,6 @@ class PasswordResetHandler extends React.Component {
     }
 
     componentDidMount() {
-        console.log('password reset component did MOUNT');
         if (this.props.match.params.token) {
             this.props.actionSubmitPasswordResetToken(this.props.match.params.token);
         } else {
@@ -93,7 +92,7 @@ class PasswordResetHandler extends React.Component {
                     status: 'error',
                     title: 'An error has occurred:',
                     message: '',
-                    errors: {},
+                    errors: errorChangePassword,
                 },
             });
         }
@@ -122,12 +121,13 @@ class PasswordResetHandler extends React.Component {
     }
 
     render() {
+        console.log('reset props', this.props);
         const { classes, isLoading } = this.props;
         return (
-            <React.Fragment>
+            <>
                 <main>
                     {isLoading ? <Loading /> : null}
-                    <Card className={classes.root}>
+                    <Card id="noShadow" className={classes.root}>
                         <CardHeader
                             className={classes.header}
                             title={(
@@ -162,7 +162,7 @@ class PasswordResetHandler extends React.Component {
                     />
                 </main>
                 <Footer />
-            </React.Fragment>
+            </>
         );
     }
 }
@@ -183,11 +183,8 @@ PasswordResetHandler.propTypes = {
 
 const mapStateToProps = (state) => {
     return {
+        ...state.auth,
         passwordResetForm: state.form.PasswordResetForm,
-        dataResetToken: state.auth.dataResetToken,
-        dataChangePassword: state.auth.dataChangePassword,
-        errorResetToken: state.auth.errorResetToken,
-        errorChangePassword: state.auth.errorChangePassword,
     };
 };
 

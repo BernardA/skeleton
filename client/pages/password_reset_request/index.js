@@ -71,10 +71,10 @@ class PasswordResetRequest extends React.Component {
         const { classes, isLoading, isOnline } = this.props;
         if (isOnline) {
             return (
-                <React.Fragment>
+                <>
                     <main>
                         {isLoading ? <Loading /> : null}
-                        <Card className={classes.root}>
+                        <Card id="noShadow" className={classes.root}>
                             <CardHeader
                                 className={classes.header}
                                 title={(
@@ -101,7 +101,7 @@ class PasswordResetRequest extends React.Component {
                         />
                     </main>
                     <Footer />
-                </React.Fragment>
+                </>
             );
         }
         return (
@@ -124,8 +124,8 @@ PasswordResetRequest.propTypes = {
 
 const mapStateToProps = (state) => {
     return {
+        ...state.auth,
         password_reset_request_form: state.form.PasswordResetRequestForm,
-        dataRequestPassword: state.auth.dataRequestPassword,
         isOnline: state.status.isOnline,
     };
 };

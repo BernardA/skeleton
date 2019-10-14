@@ -22,6 +22,12 @@ class MiscServices
                 $errors[] = [$child->getName() => str_replace('ERROR:', '', (string) $child->getErrors(true, false))];
             }
         }
+        $err_msg = array();
+        foreach( $errors as $error ){
+            foreach ($error as $key => $val) {
+                $err_msg[] = [$key => $val];
+            }
+        }
         return $errors;
     }
 }

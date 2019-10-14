@@ -20,6 +20,7 @@ class LoginForm extends React.Component {
             handleSubmit,
             invalid,
             submitting,
+            pristine,
             error,
             submitLogin,
             handleToggleVisiblePassword,
@@ -82,7 +83,7 @@ class LoginForm extends React.Component {
                     variant="contained"
                     fullWidth
                     color="primary"
-                    disabled={submitting || invalid}
+                    disabled={pristine || submitting || invalid}
                     name="_submit"
                     type="submit"
                 >
@@ -102,6 +103,7 @@ LoginForm.propTypes = {
     submitLogin: PropTypes.func.isRequired,
     invalid: PropTypes.bool.isRequired,
     submitting: PropTypes.bool.isRequired,
+    pristine: PropTypes.bool.isRequired,
 };
 
 const decorated = withStyles(styles)(LoginForm);

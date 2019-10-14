@@ -53,7 +53,7 @@ class ApiAddressController extends Controller
         }
         $errors = $this->miscServices->getErrorMessages($form);
         return $this->json(array(
-            'errors' => $errors,
+            $errors,
         ), Response::HTTP_BAD_REQUEST);
     }
 
@@ -99,8 +99,7 @@ class ApiAddressController extends Controller
             if (!$form->isValid()) {
                 $errors = $this->miscServices->getErrorMessages($form);
                 return $this->json(array(
-                    'errors' => $errors,
-                    'errorException' => $e->getMessage(),
+                    $errors,
                 ), Response::HTTP_BAD_REQUEST);
             }
         }

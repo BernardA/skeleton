@@ -3,7 +3,9 @@ import { NavLink, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { MenuList, MenuItem } from '@material-ui/core';
 import { withCookies, Cookies } from 'react-cookie';
+import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+import styles from '../styles';
 
 
 class Nav extends React.Component {
@@ -30,6 +32,7 @@ class Nav extends React.Component {
     }
 
     render() {
+        const { classes } = this.props;
         const isAdmin = () => {
             if (this.state.session && this.state.session.is_admin) {
                 return (
@@ -55,7 +58,7 @@ class Nav extends React.Component {
         };
 
         return (
-            <MenuList className="nav grid">
+            <MenuList className={classes.nav}>
                 <NavLink exact to="/" isActive={match => (!!match)}>
                     <MenuItem disableGutters>
                         Home
@@ -85,6 +88,7 @@ class Nav extends React.Component {
 Nav.propTypes = {
     cookies: PropTypes.instanceOf(Cookies).isRequired,
     allCookies: PropTypes.object.isRequired,
+    classes: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -94,4 +98,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default withCookies(withRouter(connect(mapStateToProps)(Nav)));
+export default withCookies(withRouter(connect(mapStateToProps)(withStyles(styles)(Nav))));

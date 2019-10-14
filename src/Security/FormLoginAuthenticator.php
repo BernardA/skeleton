@@ -185,7 +185,6 @@ class FormLoginAuthenticator extends AbstractGuardAuthenticator
             array(
             	'reason' => $this->failure, 
             	'message' => $this->message,
-            	'referer' => $this->referer,
             ), Response::HTTP_UNAUTHORIZED
         );
 	}

@@ -21,6 +21,20 @@ class User extends BaseUser
     protected $id;
 
     /**
+     * @Assert\Length(min=5, max=50)
+     */
+    protected $username;
+
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Regex(
+     *      pattern="/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{10,50})/",
+     *      message="Password must be between 10-50 characters long and contain at least one digit, one upper case letter and one lower case letter and one symbol !@#$%^&* ",
+     * )
+     */
+    protected $plainPassword;
+
+    /**
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
      */
@@ -79,6 +93,42 @@ class User extends BaseUser
     public function __construct()
     {
         parent::__construct();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPlainPassword()
+    {
+        return $this->plainPassword;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPlainPassword($password)
+    {
+        $this->plainPassword = $password;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUsername($username)
+    {
+        $this->username = $username;
+
+        return $this;
     }
 
     public function getFirstName(): ?string

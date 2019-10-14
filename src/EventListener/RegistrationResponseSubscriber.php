@@ -17,6 +17,7 @@ use Symfony\Component\Routing\RouterInterface;
 use FOS\UserBundle\Util\TokenGeneratorInterface;
 use App\Service\MiscServices;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class RegistrationResponseSubscriber implements EventSubscriberInterface
 {
@@ -66,7 +67,6 @@ class RegistrationResponseSubscriber implements EventSubscriberInterface
         //$this->userManager->findUserByEmail($email) ? $user = true : $user = false;
 
         $response  = new JsonResponse(array(
-            'status' => 'ok',
             'email' => $email,
             'username' => $user->getUsername(),
         ));  
@@ -77,21 +77,11 @@ class RegistrationResponseSubscriber implements EventSubscriberInterface
     {
         $form = $event->getForm();
         $errors = $this->miscServices->getErrorMessages($form);
-        $err_msg = array();
-        foreach( $errors as $key => $val ){
-            if( count(array_filter(array_keys($val), 'is_string')) > 0 ){
-                foreach( $val as $key1 => $val1 ){
-                    $err_msg[$key] = $val1[0];
-                } 
-            }else{
-                $err_msg[$key] = $val[0];
-            }
-        }
+
 
         $response  = new JsonResponse(array(
-            'status' => 'error',
-            'errors' => $err_msg,
-        ));  
+            $errors,
+        ), Response::HTTP_BAD_REQUEST);  
         $event->setResponse($response);   
     }
 
@@ -106,6 +96,7 @@ class RegistrationResponseSubscriber implements EventSubscriberInterface
     {
         $url = $this->router->generate('registration_result', array('status' => 'failed'));
         $response = new RedirectResponse($url);
+        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         $event->setResponse($response); 
     }
 

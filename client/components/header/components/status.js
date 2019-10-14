@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import { withCookies } from 'react-cookie';
+import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+import styles from '../styles';
 
 class Status extends React.Component {
     constructor(props) {
@@ -37,14 +39,14 @@ class Status extends React.Component {
     }
 
     render() {
-        const { isOnline } = this.props;
+        const { isOnline, classes } = this.props;
         const linkAuth = () => {
             if (this.state.username != null) {
                 return (
-                    <div className="signer flex">
-                        <ButtonBase>
+                    <div className={classes.signer}>
+                        <ButtonBase className={classes.welcome}>
                             <span>Welcome</span>
-                            <span className="status_user">{this.state.username}</span>
+                            <span className={classes.statusUser}>{this.state.username}</span>
                         </ButtonBase>
                         {
                             isOnline ? (
@@ -61,7 +63,7 @@ class Status extends React.Component {
                 );
             }
             return (
-                <div className="signer flex">
+                <div className={classes.signer}>
                     <ButtonBase
                         component={Link}
                         to="/login"
@@ -79,7 +81,7 @@ class Status extends React.Component {
         };
 
         return (
-            <div className="status">
+            <div className={classes.root}>
                 { linkAuth() }
             </div>
         );
@@ -89,6 +91,7 @@ class Status extends React.Component {
 Status.propTypes = {
     allCookies: PropTypes.object.isRequired,
     isOnline: PropTypes.bool.isRequired,
+    classes: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -101,4 +104,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default withCookies(connect(mapStateToProps)(Status));
+export default withCookies(connect(mapStateToProps)(withStyles(styles)(Status)));

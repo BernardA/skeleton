@@ -95,3 +95,11 @@ export const frenchAmount = value => (
         ? 'Montant invalide'
         : undefined
 );
+
+export const passwordReq = (value) => {
+    const reg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{10,})/;
+    if (value && !reg.test(value)) {
+        return 'Password must have between 10-50 characters and contain at least: 1 number, 1 letter, 1 capital letter and one symbol !@#$%^&*';
+    }
+    return null;
+};

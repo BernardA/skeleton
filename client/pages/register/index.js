@@ -29,6 +29,7 @@ class Register extends React.Component {
         super(props);
         this.state = {
             isPasswordMasked: true,
+            isClearForm: false,
             notification: {
                 status: '',
                 title: '',
@@ -39,6 +40,7 @@ class Register extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
+        console.log('register update props', this.props);
         const {
             addressId,
             registerForm,
@@ -63,6 +65,7 @@ class Register extends React.Component {
             const message = `A confirmation e-mail was sent to ${dataRegister.email}. 
             Please check your mailbox and click on the link on that e-mail.`;
             this.setState({
+                isClearForm: true,
                 notification: {
                     status: 'ok_and_dismiss',
                     title: 'You are now registered.',
@@ -87,6 +90,7 @@ class Register extends React.Component {
     handleNotificationDismiss = () => {
         const status = this.state.notification.status;
         this.setState({
+            isClearForm: false,
             notification: {
                 status: '',
                 title: '',
@@ -94,19 +98,20 @@ class Register extends React.Component {
                 errors: {},
             },
         });
-        if (status === 'ok') {
+        if (status === 'ok_and_dismiss') {
             this.props.history.push('/');
         }
     }
 
     render() {
         const { classes, isLoading, isOnline } = this.props;
+        const { isClearForm, isPasswordMasked } = this.state;
         if (isOnline) {
             return (
                 <React.Fragment>
                     <main>
                         {isLoading ? <Loading /> : null}
-                        <Card className={classes.root}>
+                        <Card id="noShadow" className={classes.root}>
                             <CardHeader
                                 className={classes.header}
                                 title={(
@@ -121,12 +126,9 @@ class Register extends React.Component {
                                 </div>
                                 <RegisterForm
                                     submitRegister={this.onSubmitRegister}
-                                    isPasswordMasked={
-                                        this.state.isPasswordMasked
-                                    }
-                                    handleToggleVisiblePassword={
-                                        this.handleToggleVisiblePassword
-                                    }
+                                    isClearForm={isClearForm}
+                                    isPasswordMasked={isPasswordMasked}
+                                    handleToggleVisiblePassword={this.handleToggleVisiblePassword}
                                 />
                             </CardContent>
                         </Card>

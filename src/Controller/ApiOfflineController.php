@@ -37,7 +37,6 @@ class ApiOfflineController extends Controller
 
             if ($requestToken != $sessionToken) {
                 return $this->json(array(
-                    'status' => 'error',
                     'error' => 'Invalid Token'
                 ), Response::HTTP_UNAUTHORIZED);
             }

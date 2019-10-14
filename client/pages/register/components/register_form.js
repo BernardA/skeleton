@@ -1,28 +1,67 @@
 import React from 'react';
-import { Field, reduxForm } from 'redux-form';
+import { connect } from 'react-redux';
+import {
+    Field,
+    reduxForm,
+    formValueSelector,
+    getFormMeta,
+} from 'redux-form';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
-import PropTypes from 'prop-types';
 import FormGroup from '@material-ui/core/FormGroup';
+import PropTypes from 'prop-types';
+import PasswordStrength from '../../../components/passwordStrength';
 import {
-    required, minLength, maxLength, isEmail, isMatchPassword, rgpd, isSpace,
+    required,
+    minLength,
+    maxLength,
+    isEmail,
+    isMatchPassword,
+    rgpd,
+    isSpace,
+    passwordReq,
 } from '../../../tools/validator';
 import { renderInput, renderCheckBox, renderPassword } from '../../../components/form_inputs';
 import styles from '../styles';
 
 // validation like maxLength(n) will cause errors as per https://github.com/erikras/redux-form/issues/4017#issuecomment-386788539
 // so get assignment of n off render as follows
-
+const minLength5 = minLength(5);
+const maxLength50 = maxLength(50);
 const maxLength180 = maxLength(180);
-const minLength8 = minLength(8);
 const match = ['fos_user_registration_form', 'plainPassword', 'first'];
 const isMatchPlainPasswordFirst = isMatchPassword(match);
 
-
 class RegisterForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isActivePlainPassword: false,
+        };
+    }
+
+    componentDidUpdate(prevProps) {
+        console.log('register form UPDATE', this.props.fields);
+        const { isClearForm, fields } = this.props;
+        if (!prevProps.isClearForm && isClearForm) {
+            this.props.reset();
+        }
+        if (prevProps.fields !== fields) {
+            let isActivePlainPassword = false;
+            if (fields.fos_user_registration_form &&
+                fields.fos_user_registration_form.plainPassword &&
+                fields.fos_user_registration_form.plainPassword.first.active
+            ) {
+                isActivePlainPassword = true;
+            }
+            this.setState({ isActivePlainPassword });
+        }
+    }
+
     render() {
+        console.log('register form props', this.props);
         const {
             classes,
             handleSubmit,
@@ -34,6 +73,7 @@ class RegisterForm extends React.Component {
             submitRegister,
             handleToggleVisiblePassword,
             isPasswordMasked,
+            plainPassword,
         } = this.props;
 
         if (error) {
@@ -66,7 +106,7 @@ class RegisterForm extends React.Component {
                         label="Username"
                         variant="outlined"
                         component={renderInput}
-                        validate={[required, maxLength180]}
+                        validate={[required, minLength5, maxLength50]}
                     />
                 </div>
                 <div className="form_input">
@@ -77,8 +117,12 @@ class RegisterForm extends React.Component {
                         label="Password"
                         variant="outlined"
                         component={renderPassword}
-                        validate={[required, minLength8, isSpace]}
+                        validate={[required, isSpace, passwordReq]}
                         handleToggleVisiblePassword={handleToggleVisiblePassword}
+                    />
+                    <PasswordStrength
+                        plainPassword={plainPassword}
+                        isActivePlainPassword={this.state.isActivePlainPassword}
                     />
                 </div>
                 <div className="form_input">
@@ -151,7 +195,7 @@ class RegisterForm extends React.Component {
                     <Field
                         name="fos_user_registration_form[rgpd]"
                         type="checkbox"
-                        value="on"
+                        value="off"
                         text="Acceptation RGPD"
                         component={renderCheckBox}
                         validate={rgpd}
@@ -163,11 +207,9 @@ class RegisterForm extends React.Component {
                             className={classes.body2}
                             align="justify"
                         >
-                            Je certifie avoir l`&apos;`âge légal, avoir lu et accepté la
-                            <Link to="/mentions-legales">
-                                Politique de confidentialité
-                            </Link>
-                            de monsite.fr.
+                            Je certifie avoir l&apos;âge légal, avoir lu et accepté la &ensp;
+                            <Link to="/mentions-legales">Politique de confidentialité </Link>
+                            &ensp; de monsite.fr.
                         </Typography>
                     </div>
                 </div>
@@ -178,7 +220,7 @@ class RegisterForm extends React.Component {
                             className={classes.button}
                             variant="contained"
                             color="primary"
-                            disabled={submitting || invalid}
+                            disabled={pristine || submitting || invalid}
                             name="_submit"
                             type="submit"
                         >
@@ -207,14 +249,34 @@ RegisterForm.propTypes = {
     handleSubmit: PropTypes.func.isRequired,
     handleToggleVisiblePassword: PropTypes.func.isRequired,
     isPasswordMasked: PropTypes.bool.isRequired,
+    isClearForm: PropTypes.bool.isRequired,
     submitting: PropTypes.bool.isRequired,
     invalid: PropTypes.bool.isRequired,
     reset: PropTypes.func.isRequired,
     pristine: PropTypes.bool.isRequired,
+    plainPassword: PropTypes.any,
+    fields: PropTypes.object.isRequired,
 };
 
+const selector = formValueSelector('RegisterForm');
+
+export default connect(
+    (state) => {
+        const plainPassword = selector(state, 'fos_user_registration_form[plainPassword][first]');
+        const fields = getFormMeta('RegisterForm')(state);
+        return {
+            plainPassword,
+            fields,
+        };
+    },
+)(reduxForm({
+    form: 'RegisterForm',
+})(withStyles(styles)(RegisterForm)));
+
+/*
 const decorated = withStyles(styles)(RegisterForm);
 
 export default reduxForm({
     form: 'RegisterForm',
 })(decorated);
+*/

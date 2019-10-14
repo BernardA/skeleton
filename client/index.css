@@ -82,31 +82,6 @@ li {
     justify-content: space-between;
 }
 
-/**
-* grid
-*/
-
-.grid {
-    display: grid;
-}
-
-/**
-* flexbox
-*/
-
-.flex {
-    display: flex;
-}
-
-.flex_column {
-    flex-direction: column;
-}
-
-.flex_wrap {
-    flex-wrap: wrap;
-}
-
-
 
 /**
 * form
@@ -138,67 +113,24 @@ form {
     color: red;
     font-size: 14px;
     text-align: left;
+    display: block;
 }
 
 input[type="radio"] {
     margin-right: 5px;
 }
 
+.passwordOk {
+    color: green;
+}
+
+
 /**
-* header
+* override material-ui by specificity 
 */
 
-.header_top {
-    grid-template-columns: 190px auto;
-    background-color: #2d5074;
-    height: 60px;
-}
-
-.branding {
-    justify-self: start;
-    width: 190px;
-}
-
-.status {
-    justify-self: end;
-}
-
-.status_user {
-    width: 65px;
-    display: block;
-    word-wrap: break-word;
-}
-
-.signer button, .signer a {
-	font-weight: 600;
-	width: 65px;
-	color: #fff;
-	height: 60px;
-	font-size: 12px;
-    flex-direction: column;
-}
-
-.signer div:first-child {
-    border-left-color: #ccc;
-}
-
-.nav.grid {
-    grid-template-columns: repeat(auto-fill, minmax(60px, auto));
-    padding: 0 10px 0 0;
-    background-color: #fff;
-}
-
-.nav a {
-	text-transform: uppercase;
-    text-decoration: none;
-    color: #445565;
-}
-
-.nav li {
-    padding: 0 5px 0;
-    font-weight: 700;
-    font-size: 0.8rem;
-    height: 35px;
+#noShadow {
+    box-shadow: none;
 }
 
 

@@ -121,7 +121,6 @@ class GoogleLoginAuthenticator extends AbstractGuardAuthenticator
         $this->message = 'Vous êtes désormais connecté(e), ' . $this->user->getUsername();
         return new JsonResponse(
             array(
-            	'status' => 'ok',
             	'message' => $this->message,
                 'referer' => $this->referer,
                 'session_info' => $session_info,
@@ -147,11 +146,10 @@ class GoogleLoginAuthenticator extends AbstractGuardAuthenticator
         
         return new JsonResponse(
             array(
-            	'status' => 'error',
             	'reason' => $this->failure, 
             	'message' => $this->message,
             	'referer' => $this->referer,
-            	)
+            	), Response::HTTP_UNAUTHORIZED
         );
     }
     

@@ -15,7 +15,6 @@ const initialState = {
 };
 
 export default (state = initialState, action) => {
-    console.log('register reducer', action);
     switch (action.type) {
     case REGISTER_INIT:
         return {
@@ -42,7 +41,7 @@ export default (state = initialState, action) => {
     case INSERT_ADDRESS_OK:
         return {
             ...state,
-            addressId: action.data,
+            addressId: action.data.addressId,
         };
     case INSERT_ADDRESS_ERROR:
         return {

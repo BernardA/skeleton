@@ -5,6 +5,7 @@ namespace App\EventListener;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\FOSUserEvents;
 use App\PwaBdaEvents;
+use App\Service\MiscServices;
 use FOS\UserBundle\Event\GetResponseUserEvent;
 use FOS\UserBundle\Event\GetResponseNullableUserEvent;
 use App\Event\GetResponseEvent;
@@ -25,13 +26,21 @@ class PasswordResetSubscriber implements EventSubscriberInterface
     private $translator;
     private $userManager;
     private $router;
+    private $miscServices;
 
-    public function __construct(SessionInterface $session,TranslatorInterface $translator, UserManagerInterface $userManager, RouterInterface $router)
+    public function __construct(
+        SessionInterface $session,
+        TranslatorInterface $translator, 
+        UserManagerInterface $userManager, 
+        RouterInterface $router,
+        MiscServices $miscServices
+    )
     {
         $this->session = $session;
         $this->translator = $translator;
         $this->userManager = $userManager;
         $this->router = $router;
+        $this->miscServices = $miscServices;
     }
 
     public function onSendEmailInitialize(GetResponseNullableUserEvent $event)
@@ -95,6 +104,17 @@ class PasswordResetSubscriber implements EventSubscriberInterface
         $event->setResponse($response);
     }
 
+    public function onResettingResetFailure(FormEvent $event)
+    {
+        $form = $event->getForm();
+        $errors = $this->miscServices->getErrorMessages($form);
+
+        $response  = new JsonResponse(array(
+            $errors,
+        ), Response::HTTP_BAD_REQUEST);  
+        $event->setResponse($response); 
+    }
+
     public static function getSubscribedEvents()
     {
         return [
@@ -102,7 +122,8 @@ class PasswordResetSubscriber implements EventSubscriberInterface
             FOSUserEvents::RESETTING_SEND_EMAIL_COMPLETED => 'onSendEmailCompleted',
             FOSUserEvents::RESETTING_RESET_SUCCESS => ['onResettingResetSuccess', -10],
             FOSUserEvents::RESETTING_RESET_INITIALIZE => ['onResetInitialize', -10],
-            PwaBdaEvents::PASSWORD_RESET_INITIALIZE_FAILURE => 'onPasswordResetInitializeFailure'
+            PwaBdaEvents::PASSWORD_RESET_INITIALIZE_FAILURE => 'onPasswordResetInitializeFailure',
+            PwaBdaEvents::RESETTING_RESET_FAILURE => 'onResettingResetFailure',
         ];
     }
 }

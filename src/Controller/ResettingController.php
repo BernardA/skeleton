@@ -209,11 +209,14 @@ class ResettingController extends Controller
 
                 return $response;
             }
-
+            $event = new FormEvent($form, $request);
+            $this->eventDispatcher->dispatch(PwaBdaEvents::RESETTING_RESET_FAILURE, $event);
+            return $event->getResponse();
+            /*
             return $this->render('@FOSUser/Resetting/reset.html.twig', array(
                 'token' => $token,
                 'form' => $form->createView(),
             ));
-        
+            */
     }
 }

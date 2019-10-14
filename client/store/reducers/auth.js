@@ -28,7 +28,6 @@ const initialState = {
 };
 
 export default (state = initialState, action) => {
-    console.log('offline reducer', action);
     switch (action.type) {
     case LOGIN_INIT:
         return {

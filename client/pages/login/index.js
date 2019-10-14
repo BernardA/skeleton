@@ -57,7 +57,7 @@ class Login extends React.Component {
                 notification: {
                     status: 'error',
                     title: 'There was an error.',
-                    message: 'Your credentials are invalid.',
+                    message: errorLogin.message,
                     errors: {},
                 },
             });
@@ -148,7 +148,7 @@ class Login extends React.Component {
                 <React.Fragment>
                     <main id="login_page">
                         {isLoading ? <Loading /> : null}
-                        <Card className={classes.root}>
+                        <Card id="noShadow" className={classes.root}>
                             <CardHeader
                                 className={classes.header}
                                 title={(

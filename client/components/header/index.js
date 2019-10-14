@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Link, withRouter } from 'react-router-dom';
 import ButtonBase from '@material-ui/core/ButtonBase';
+import { withStyles } from '@material-ui/core/styles';
 import Img from 'react-webp-image';
 import localforage from 'localforage';
 import PropTypes from 'prop-types';
@@ -16,6 +17,7 @@ import {
 } from '../../store/actions';
 import { MAIN_LOGO_PATH_PNG, MAIN_LOGO_PATH_WEBP } from '../../parameters';
 import RgpdDialog from '../rgpd_dialog';
+import styles from './styles';
 
 class Header extends React.Component {
     constructor(props) {
@@ -103,7 +105,7 @@ class Header extends React.Component {
     }
 
     render() {
-        const { location } = this.props;
+        const { location, classes } = this.props;
         return (
             <React.Fragment>
                 {
@@ -113,9 +115,9 @@ class Header extends React.Component {
                         null
                 }
                 <header>
-                    <div className="header_top grid">
+                    <div className={classes.headerTop}>
                         <ButtonBase
-                            className="branding"
+                            className={classes.branding}
                             component={Link}
                             to="/"
                         >
@@ -146,6 +148,7 @@ Header.propTypes = {
     isOnline: PropTypes.bool.isRequired,
     actionGetInitialDataForOffline: PropTypes.func.isRequired,
     actionGetUserDataForOffline: PropTypes.func.isRequired,
+    classes: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -167,4 +170,4 @@ function mapDispatchToProps(dispatch) {
     }, dispatch);
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Header));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Header)));

@@ -22,7 +22,6 @@ const initialState = {
 };
 
 export default (state = initialState, action) => {
-    console.log('offline reducer', action);
     switch (action.type) {
     case ONLINE_STATUS:
         return {
