@@ -11,7 +11,7 @@ export default () => {
             justifySelf: 'start',
             width: '190px',
         },
-        root: {
+        status: {
             justifySelf: 'end',
         },
         statusUser: {

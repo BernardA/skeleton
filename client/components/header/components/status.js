@@ -81,7 +81,7 @@ class Status extends React.Component {
         };
 
         return (
-            <div className={classes.root}>
+            <div className={classes.status}>
                 { linkAuth() }
             </div>
         );
