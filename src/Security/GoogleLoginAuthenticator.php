@@ -14,7 +14,6 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
-use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Doctrine\ORM\EntityManagerInterface;
 
 class GoogleLoginAuthenticator extends AbstractGuardAuthenticator
